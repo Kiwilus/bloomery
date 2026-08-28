@@ -29,6 +29,8 @@ pub enum Commands {
         #[arg(short, long, default_value = ".")]
         path: PathBuf,
     },
+    // clean, remove bin or target directory
+    Clean,
     // compilation process
     Build,
     // execution process

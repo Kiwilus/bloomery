@@ -19,6 +19,7 @@ fn main() -> Result<()> {
             commands::build::build()?;
             commands::run::run()?;
         }
+        Commands::Clean => commands::clean::clean()?,
     }
 
     Ok(())
