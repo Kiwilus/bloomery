@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -19,6 +20,10 @@ enum Commands {
     Init {
         // naming process is optional
         name: Option<String>,
+
+        // Selected template
+        #[arg(short, long, default_value = "default")]
+        template: String,
     },
     // compilation process
     Build,
@@ -34,11 +39,76 @@ struct Config {
     main_class: String,
 }
 
+// struct to give a file a path and a content
+struct FileTemplate {
+    path: &'static str,
+    content: &'static str,
+}
+
+// struct to describe the project template
+struct ProjectTemplate {
+    name: &'static str,
+    dirs: &'static [&'static str],
+    files: &'static [FileTemplate],
+    main_class: &'static str,
+}
+
+// Two templates; an advanced and a default one
+fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
+    let mut map = HashMap::new();
+
+    /*
+     * This is a minimal template
+     */
+    map.insert(
+        "default",
+        ProjectTemplate {
+            name: "default",
+            dirs: &["src", "bin"],
+            main_class: "Main",
+            files: &[
+                FileTemplate {
+                    path: "src/Main.java",
+                    content: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
+                },
+                FileTemplate {
+                    path: ".gitignore",
+                    content: "/bin/\n*.class\n",
+                },
+            ],
+        },
+    );
+
+    /*
+     * This is a maven like template
+     */
+    map.insert(
+        "advanced",
+        ProjectTemplate {
+            name: "advanced",
+            dirs: &["src/main/java", "target/classes"],
+            main_class: "Main",
+            files: &[
+                FileTemplate {
+                    path: "src/main/java/Main.java",
+                    content: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
+                },
+                FileTemplate {
+                    path: ".gitignore",
+                    content: "/target/\n*.class\n",
+                },
+            ],
+        },
+    );
+
+    map
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init { name } => init(name)?,
+        Commands::Init { name, template } => init(name, &template)?,
         Commands::Build => build()?,
         Commands::Run => {
             // I don't like that the code compiles again for now,
@@ -51,20 +121,22 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-/* At this point, the project structure is still hard-coded and there is only one template.
- * It should be reworked into selectable templates so that I can have a structure like:
- * .
- * |__ bin
- * |__ src
- * |  |__ Main.java
- * |__ .gitignore
- *
- * Or something like this.
- *
- * It should also be possible to install a template locally yourself and then install and use it.
+/*
+ * It should be possible to install a template locally yourself and then install and use it.
  * I think this is supposed to be achieved somehow with toml parsing unctions.
  */
-fn init(name: Option<String>) -> Result<()> {
+// init function that creates the project
+fn init(name: Option<String>, template_name: &str) -> Result<()> {
+    let templates = get_templates();
+
+    let template = templates.get(template_name).ok_or_else(|| {
+        anyhow::anyhow!(
+            "Unknown template: '{}'. Available templates: {:?}",
+            template_name,
+            templates.keys().collect::<Vec<_>>()
+        )
+    })?;
+
     let project_name = name.unwrap_or_else(|| "bloomery-project".to_string());
     let root = Path::new(&project_name);
 
@@ -72,32 +144,33 @@ fn init(name: Option<String>) -> Result<()> {
         bail!("'{}' already exists", project_name);
     }
 
-    fs::create_dir_all(root.join("src/main/java"))?;
-    fs::create_dir_all(root.join("target/classes"))?;
+    // create directories defined by the template
+    for dir in template.dirs {
+        fs::create_dir_all(root.join(dir))?;
+    }
 
-    // hardcoded too; revise!!!
+    // config structure dynamic per template
     let config = format!(
-r#"# name of your project
+        r#"# name of the project
 name = "{}"
-# Version of your project
+# Version of the project
 version = "0.1.0"
-# class, which will run
-main_class = "Main"
+# class to run
+main_class = "{}"
 "#,
-        project_name
+        project_name, template.main_class
     );
     fs::write(root.join("bloomery.toml"), config)?;
 
-    // Java file with Hello World program.
-    let main_java = r#"public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
+    // Write files defined by the template
+    for file in template.files {
+        fs::write(root.join(file.path), file.content)?;
     }
-}
-"#;
-    fs::write(root.join("src/main/java/Main.java"), main_java)?;
 
-    println!("project created: {}", project_name);
+    println!(
+        "Project created: {} with '{}' template",
+        project_name, template.name
+    );
 
     Ok(())
 }
@@ -127,15 +200,16 @@ fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
+// build function to compile java code
 fn build() -> Result<()> {
     let config = load_config()?;
     println!("Building project '{}' v{}", config.name, config.version);
 
-    let src_dir = Path::new("src/main/java");
+    let src_dir = Path::new("src");
     let java_files = find_java_files(src_dir)?;
 
     if java_files.is_empty() {
-        bail!("No .java file found at src/main/java");
+        bail!("No .java file found at src/");
     }
 
     fs::create_dir_all("target/classes")?;
@@ -157,6 +231,7 @@ fn build() -> Result<()> {
     Ok(())
 }
 
+// compiles java code and runs it directly
 fn run() -> Result<()> {
     let config = load_config()?;
     println!("Starting {} ...", config.main_class);
