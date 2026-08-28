@@ -29,7 +29,7 @@ Run the project:
 blm run
 ```
 
-If no project name is given, `bloomery init` creates a project called `bloomery-project`.
+If no project name is given, `blm init` creates a project called `bloomery-project`.
 
 ## Project Structure
 

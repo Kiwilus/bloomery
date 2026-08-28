@@ -77,8 +77,11 @@ fn init(name: Option<String>) -> Result<()> {
 
     // hardcoded too; revise!!!
     let config = format!(
-        r#"name = "{}"
+r#"# name of your project
+name = "{}"
+# Version of your project
 version = "0.1.0"
+# class, which will run
 main_class = "Main"
 "#,
         project_name
