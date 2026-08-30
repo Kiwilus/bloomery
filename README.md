@@ -9,6 +9,20 @@ I don't need millions of features, complicated configuration or a huge build sys
 
 Bloomery is my attempt at making a small tool that does what I need and nothing more.
 
+## Installation
+
+clone the repo and change into it:
+
+```bash
+git clone https://github.com/Kiwilus/bloomery.git && cd bloomery
+```
+
+install bloomery system wide:
+
+```bash
+cargo install --path .
+```
+
 ## Usage
 
 Create a new project:
