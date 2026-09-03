@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::Result;
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -22,7 +22,7 @@ pub struct StoredTemplate {
 // get template directory
 pub fn get_templates_dir() -> Result<PathBuf> {
     let proj_dirs = ProjectDirs::from("", "", "bloomery")
-        .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?;
+        .ok_or_else(|| error!("Could not determine config directory"))?;
     let templates_dir = proj_dirs.config_dir().join("templates");
     fs::create_dir_all(&templates_dir)?;
     Ok(templates_dir)
@@ -31,7 +31,8 @@ pub fn get_templates_dir() -> Result<PathBuf> {
 // install a directory as a system-wide template
 pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
     if !source_dir.exists() {
-        bail!("Source directory '{}' does not exist", source_dir.display());
+        error!("Source directory '{}' does not exist", source_dir.display());
+        std::process::exit(1);
     }
 
     let mut dirs = Vec::new();
@@ -47,11 +48,15 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
     };
 
     let target_path = get_templates_dir()?.join(format!("{}.toml", name));
-    let toml_string =
-        toml::to_string_pretty(&template_data).context("Failed to serialize template data")?;
+    let toml_string = match toml::to_string_pretty(&template_data) {
+        Ok(data) => data,
+        Err(_) => {
+            error!("Failed to serialize template data");
+        }
+    };
 
     fs::write(&target_path, toml_string)?;
-    println!(
+    success!(
         "Template '{}' installed successfully at {}",
         name,
         target_path.display()

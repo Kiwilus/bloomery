@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
@@ -10,7 +10,7 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
     let root = Path::new(&project_name);
 
     if root.exists() {
-        bail!("'{}' already exists", project_name);
+        warn!("'{}' already exists", project_name);
     }
 
     // trying to load custom system-wide template first
@@ -41,7 +41,7 @@ main_class = "{}"
             fs::write(root.join(&file.path), &file.content)?;
         }
 
-        println!(
+        info!(
             "Project created: {} (using installed template '{}')",
             project_name, ext_template.name
         );
@@ -51,7 +51,7 @@ main_class = "{}"
     // fallback to built-in templates
     let builtin_templates = get_templates();
     let template = builtin_templates.get(template_name).ok_or_else(|| {
-        anyhow::anyhow!(
+        error!(
             "Unknown template: '{}'. Built-in options: {:?}",
             template_name,
             builtin_templates.keys().collect::<Vec<_>>()
@@ -78,7 +78,7 @@ main_class = "{}"
         fs::write(root.join(file.path), file.content)?;
     }
 
-    println!(
+    info!(
         "Project created: {} with '{}' template",
         project_name, template.name
     );

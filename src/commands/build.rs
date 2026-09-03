@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::Result;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -26,30 +26,35 @@ fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
 // build function to compile java code
 pub fn build() -> Result<()> {
     let config = load_config()?;
-    println!("Building project '{}' v{}", config.name, config.version);
+    info!("Building project '{}' v{}", config.name, config.version);
 
     let src_dir = Path::new("src");
     let java_files = find_java_files(src_dir)?;
 
     if java_files.is_empty() {
-        bail!("No .java file found at src/");
+        error!("No .java file found at src/");
     }
 
     fs::create_dir_all("target/classes")?;
 
-    let status = Command::new("javac")
+    let status = match Command::new("javac")
         .arg("-d")
         .arg("target/classes")
         .arg("-encoding")
         .arg("UTF-8")
         .args(&java_files)
         .status()
-        .context("javac not found.")?;
+    {
+        Ok(status) => status,
+        Err(_) => {
+            crate::error!("javac not found.");
+        }
+    };
 
     if !status.success() {
-        bail!("Compilation failed");
+        error!("Compilation failed");
     }
 
-    println!("Build successfully ({} files)", java_files.len());
+    success!("Build successfully ({} files)", java_files.len());
     Ok(())
 }
