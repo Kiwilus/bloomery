@@ -33,6 +33,14 @@ pub enum Commands {
     Clean,
     // compilation process
     Build,
+    // build single file
+    BuildFile {
+        path: PathBuf,
+    },
     // execution process
     Run,
+    // run single file
+    RunFile {
+        path: PathBuf,
+    },
 }

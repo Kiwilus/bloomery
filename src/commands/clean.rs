@@ -2,6 +2,11 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
+/*
+ * The clean command only deletes the target director,
+ * but what if my .class files are stored in /bin?
+ */
+
 // delete 'target' directory
 pub fn clean() -> Result<()> {
     let target = Path::new("target");

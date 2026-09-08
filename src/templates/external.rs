@@ -32,7 +32,6 @@ pub fn get_templates_dir() -> Result<PathBuf> {
 pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
     if !source_dir.exists() {
         error!("Source directory '{}' does not exist", source_dir.display());
-        std::process::exit(1);
     }
 
     let mut dirs = Vec::new();

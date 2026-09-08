@@ -3,7 +3,7 @@ use std::process::Command;
 
 use crate::config::load_config;
 
-// compiles java code and runs it directly
+// run compiled java code
 pub fn run() -> Result<()> {
     let config = load_config()?;
     info!("Starting {} ...", config.main_class);
@@ -16,14 +16,12 @@ pub fn run() -> Result<()> {
     {
         Ok(status) => status,
         Err(_) => {
-            crate::error!("java could not be started");
-            std::process::exit(1);
+            error!("java could not be started")
         }
     };
 
     if !status.success() {
         error!("Execution failed");
-        std::process::exit(1);
     }
 
     Ok(())

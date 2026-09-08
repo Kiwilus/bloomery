@@ -31,10 +31,20 @@ Create a new project:
 blm init <my-new-java-project>
 ```
 
+> If no project name is given, `blm init` creates a project called `bloomery-project`.
+
 Build the project:
 
 ```bash
 blm build
+```
+
+> it will build all java files in your source directory
+
+If you want to build just 1 file directly you can use:
+
+```bash
+blm build-file <file_to_build>
 ```
 
 Run the project:
@@ -43,7 +53,13 @@ Run the project:
 blm run
 ```
 
-If no project name is given, `blm init` creates a project called `bloomery-project`.
+> it will run all java files in your source directory
+
+If you want to run just 1 file directly you can use:
+
+```bash
+blm run-file <file_to_run>
+```
 
 ## Install and use a custom template
 

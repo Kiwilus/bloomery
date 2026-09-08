@@ -1,6 +1,6 @@
 [package]
 name = "blm"
-version = "1.4.0"
+version = "1.5.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/Kiwilus/bloomery.git"
@@ -13,6 +13,13 @@ serde = { version = "1", features = ["derive"] }
 toml = "1.1.5"
 directories = "6.0.0"
 owo-colors = "4.4.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
 
 [[bin]]
 name = "blm"
