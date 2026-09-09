@@ -1,6 +1,6 @@
 I use Zed as my main editor. To make my Java development faster and easier, I wrote bloomery and integrated it directly into Zed's tasks and keybindings.
 
-This way, I can run or build Java projects or single files using Zed going into the Terminal.
+This way, I can run or build Java projects or single files using Zed without going into the Terminal.
 
 ### Zed Tasks
 
