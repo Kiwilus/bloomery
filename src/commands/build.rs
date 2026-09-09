@@ -35,12 +35,11 @@ pub fn build() -> Result<()> {
         error!("No .java file found at src/");
     }
 
-    fs::create_dir_all("target/classes")?;
+    fs::create_dir_all(&config.class_dir)?;
 
-    // compilation command: javac -d target/casses -encoding UTF-8 <java_files_stored_in_variable>
     let status = match Command::new("javac")
         .arg("-d")
-        .arg("target/classes")
+        .arg(&config.class_dir)
         .arg("-encoding")
         .arg("UTF-8")
         .args(&java_files)

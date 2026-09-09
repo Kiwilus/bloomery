@@ -1,23 +1,26 @@
+use crate::config::load_config;
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-/*
- * The clean command only deletes the target director,
- * but what if my .class files are stored in /bin?
- */
-
-// delete 'target' directory
 pub fn clean() -> Result<()> {
-    let target = Path::new("target");
+    // If a bloomery.toml exists, use its class_dir.
+    // If not e.g. after a 'build-file' call, remove "bin" folder because it is hardcoded in build-file.
+    let target_dir = match load_config() {
+        Ok(config) => config.class_dir,
+        Err(_) => "bin".to_string(),
+    };
 
-    if target.exists() {
-        if fs::remove_dir_all(target).is_err() {
-            error!("Failed to remove target directory");
+    let class_path = Path::new(&target_dir);
+
+    if class_path.exists() {
+        if fs::remove_dir_all(class_path).is_ok() {
+            info!("Cleaned {}/", class_path.display());
+        } else {
+            error!("Failed to remove {}/", class_path.display());
         }
-        info!("Cleaned target/");
     } else {
-        info!("Nothing to clean (target/ does not exist)");
+        info!("Nothing to clean ({} does not exist)", class_path.display());
     }
 
     Ok(())

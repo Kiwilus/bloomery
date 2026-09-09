@@ -37,6 +37,16 @@ If you want to run just 1 file directly you can use:
 blm run-file <file_to_run>
 ```
 
+### Clean your project
+
+```bash
+blm clean
+```
+
+this will remove the folder, given in class_dir in your bloomery.toml
+
+> when no bloomery.toml file is found, it will automaticly delete the bin folder.
+
 ### Configuration
 
 The project configuration is stored in `bloomery.toml`:
@@ -45,6 +55,7 @@ The project configuration is stored in `bloomery.toml`:
 name = "my-project"
 version = "0.1.0"
 main_class = "Main"
+class_dir = "out"
 ```
 
-If you want to run an other main class, change your projects version or rename your project, do it here.
+If you want to run an other main class, change your copilation folder, change your projects version or rename your project, do it in the `bloomery.toml`.

@@ -11,6 +11,7 @@ pub fn build_file(path: &Path) -> Result<()> {
 
     /*
      * This creates a hard coded bin directory
+     * the clean command will delete it automaticly, if no bloomery.toml is found in your root folder.
      */
     std::fs::create_dir_all("bin")?;
 

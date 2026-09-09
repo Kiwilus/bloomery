@@ -25,7 +25,13 @@ Include a `bloomery.toml` file inside your template directory to pre-define proj
 name = "template-project"
 version = "0.1.0"
 main_class = "com.example.App"
+class_dir = "bin"
 ```
+
+`name` is the name of your project
+`version` is the version of your project
+`main_class` is the class to run with the run command
+`class_dir` is the directory where your .class files are stored like bin or target/classes
 
 ### Step 2: Install the template system-wide
 
@@ -38,8 +44,22 @@ blm install --name my-custom-template
 
 Bloomery serializes the folder structure and files, saving it to your global configuration directory:
 
+on linux:
+
 ```text
 ~/.config/bloomery/templates/my-custom-template.toml
+```
+
+on windows:
+
+```text
+C:\Users\<Username>\AppData\Roaming\bloomery\config\templates
+```
+
+on macos:
+
+```text
+/Users/<Username>/Library/Application Support/bloomery/templates
 ```
 
 ### Step 3: Spawn a new project from your template

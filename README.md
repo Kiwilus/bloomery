@@ -1,4 +1,4 @@
-<div align="center">
+<div>
 
 # Bloomery
 
@@ -21,17 +21,34 @@ I don't need millions of features, complicated configuration or a huge build sys
 
 Bloomery is my attempt at making a small tool that does what I need and nothing more.
 
+---
+
+## Installation
+
+To install bloomery on your system:
+
+clone the repo and change into it:
+
+```bash
+git clone https://github.com/Kiwilus/bloomery.git && cd bloomery
+```
+
+install bloomery system wide:
+
+```bash
+cargo install --path .
+```
+
 ## Documentation
 
-- [Installation](docs/installation.md)
-- [Commands](docs/usage.md)
+- [Usage](docs/usage.md)
 - [Custom Templates](docs/custom-template.md)
 
 ## How I use bloomery with zed
 
 If you are Interessted how I use bloomery in zed
 
-See the [Custom Templates guide](docs/zed-configuration.md).
+See the [Zed configuration.](docs/zed-configuration.md).
 
 ## Requirements
 

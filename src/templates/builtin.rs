@@ -11,6 +11,7 @@ pub struct ProjectTemplate {
     pub dirs: &'static [&'static str],
     pub files: &'static [FileTemplate],
     pub main_class: &'static str,
+    pub class_dir: &'static str,
 }
 
 // Two templates; an advanced and a default one
@@ -26,6 +27,7 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
             name: "default",
             dirs: &["src", "bin"],
             main_class: "Main",
+            class_dir: "bin",
             files: &[
                 FileTemplate {
                     path: "src/Main.java",
@@ -40,7 +42,7 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
     );
 
     /*
-     * This is an advanced, maven like template
+     * This is an advanced, more maven like template
      */
     map.insert(
         "advanced",
@@ -48,6 +50,7 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
             name: "advanced",
             dirs: &["src/main/java", "target/classes"],
             main_class: "Main",
+            class_dir: "target/classes",
             files: &[
                 FileTemplate {
                     path: "src/main/java/Main.java",

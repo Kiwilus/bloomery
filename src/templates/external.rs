@@ -17,6 +17,12 @@ pub struct StoredTemplate {
     pub dirs: Vec<String>,
     pub files: Vec<StoredFile>,
     pub main_class: String,
+    #[serde(default = "default_class_dir")]
+    pub class_dir: String,
+}
+
+fn default_class_dir() -> String {
+    "target/classes".to_string()
 }
 
 // get template directory
@@ -44,6 +50,7 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
         dirs,
         files,
         main_class: "Main".to_string(),
+        class_dir: "bin".to_string(),
     };
 
     let target_path = get_templates_dir()?.join(format!("{}.toml", name));

@@ -10,7 +10,7 @@ pub fn run() -> Result<()> {
 
     let status = match Command::new("java")
         .arg("-cp")
-        .arg("target/classes")
+        .arg(config.class_dir)
         .arg(&config.main_class)
         .status()
     {
