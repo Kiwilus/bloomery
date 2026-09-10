@@ -17,8 +17,8 @@ pub enum Commands {
         name: Option<String>,
 
         // Selected template (e.g., "default", "flat", or custom installed template)
-        #[arg(short, long, default_value = "default")]
-        template: String,
+        #[arg(short, long)]
+        template: Option<String>,
     },
     // install a directory as a system-wide template
     Install {

@@ -33,6 +33,8 @@ class_dir = "bin"
 `main_class` is the class to run with the run command
 `class_dir` is the directory where your .class files are stored like bin or target/classes
 
+---
+
 ### Step 2: Install the template system-wide
 
 Navigate into your template directory and register it with Bloomery by assigning it a name:
@@ -62,6 +64,8 @@ on macos:
 /Users/<Username>/Library/Application Support/bloomery/templates
 ```
 
+---
+
 ### Step 3: Spawn a new project from your template
 
 You can now initialize a new Java project anywhere on your system using the `-t` / `--template` flag:
@@ -71,3 +75,35 @@ blm init my-new-project --template my-custom-template
 ```
 
 and your project structure will be like the directory you turn into a template
+
+---
+
+### Optional step 4: Set your custom template as your default template in a config.toml file
+
+You can set a custom template you installed, as your default template if you want to use it every time and do not want to use --template every time.
+
+To use an installed template by default without passing --template every time, create a global config file:
+
+on linux:
+
+```text
+~/.config/bloomery/config.toml
+```
+
+on windows:
+
+```text
+C:\Users\<Username>\AppData\Roaming\bloomery\config.toml
+```
+
+on macos:
+
+```text
+/Users/<Username>/Library/Application Support/bloomery/config.toml
+```
+
+`example content:`
+
+```bash
+default_template = "<name_of_your_installed_template_>"
+```

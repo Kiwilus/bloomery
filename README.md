@@ -48,7 +48,7 @@ cargo install --path .
 
 If you are Interessted how I use bloomery in zed
 
-See the [Zed configuration.](docs/zed-configuration.md).
+See the [Zed configuration](docs/zed-configuration.md).
 
 ## Requirements
 

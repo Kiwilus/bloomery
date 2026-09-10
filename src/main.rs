@@ -15,7 +15,16 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init { name, template } => commands::init::init(name, &template)?,
+        Commands::Init { name, template } => {
+            let template_name = match template {
+                Some(t) => t,
+                None => {
+                    let global = config::load_global_config()?;
+                    global.default_template
+                }
+            };
+            commands::init::init(name, &template_name)?;
+        }
         Commands::Install { name, path } => templates::external::install_template(name, &path)?,
         Commands::Build => commands::build::build()?,
         Commands::BuildFile { path } => commands::build_file::build_file(&path)?,
