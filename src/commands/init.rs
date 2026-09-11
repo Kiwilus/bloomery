@@ -9,7 +9,7 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
     let root = Path::new(&project_name);
 
     if root.exists() {
-        warn!("'{}' already exists", project_name);
+        error!("'{}' already exists", project_name);
     }
 
     // process extern templates

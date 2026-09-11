@@ -19,7 +19,7 @@ pub struct Config {
     // main class
     pub main_class: String,
 
-    // directory where the compilated classes are located
+    // directory where the compiled classes are located
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
 }

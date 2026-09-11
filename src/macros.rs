@@ -1,4 +1,3 @@
-
 /*
  * file for macros like info and error
  */

@@ -1,30 +1,60 @@
 use anyhow::Result;
+use std::fs;
 use std::path::Path;
 use std::process::Command;
 
 use super::build_file;
+use crate::config::load_config;
+
+// Read the package name from a Java file if present
+fn get_full_name(path: &Path) -> Result<String> {
+    let content = fs::read_to_string(path)?;
+    let class_name = path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .ok_or_else(|| error!("Invalid Java file name"))?;
+
+    for line in content.lines() {
+        let line = line.trim();
+
+        // Find the package declaration
+        if line.starts_with("package ") && line.ends_with(';') {
+            let package = line
+                .trim_start_matches("package ")
+                .trim_end_matches(';')
+                .trim();
+
+            return Ok(format!("{}.{}", package, class_name));
+        }
+
+        // stop once the code begins
+        if !line.is_empty()
+            && !line.starts_with("//")
+            && !line.starts_with("/*")
+            && !line.starts_with('*')
+        {
+            break;
+        }
+    }
+
+    // when no package found use class name
+    Ok(class_name.to_string())
+}
 
 pub fn run_file(path: &Path) -> Result<()> {
-    /*
-     * At this point the /bin directory is hard coded.
-     */
-
-    // first building file
+    // First build the file
     build_file::build_file(path)?;
 
-    // execute the build
-    let file_name = match path.file_stem().and_then(|name| name.to_str()) {
-        Some(name) => name,
-        None => error!("Invalid Java file name"),
-    };
+    let config = load_config()?;
+    let fqn = get_full_name(path)?;
 
-    info!("Starting {} ...", file_name);
+    info!("Starting {} ...", fqn);
 
-    // java command to run .class: java -cp bin <file_name_stored_in_variable>
+    // java command to run .class: java -cp <class_dir> <full_name>
     let status = match Command::new("java")
         .arg("-cp")
-        .arg("bin")
-        .arg(file_name)
+        .arg(&config.class_dir)
+        .arg(&fqn)
         .status()
     {
         Ok(status) => status,
