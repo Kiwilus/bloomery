@@ -8,7 +8,7 @@ use std::path::PathBuf;
  * Part for the bloomery.toml configuration
  */
 // struct for the bloomery.toml file
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     // project name
     pub name: String,

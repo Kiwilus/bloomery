@@ -2,7 +2,25 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
+use crate::config::Config;
 use crate::templates::{builtin::get_templates, external::load_external_template};
+
+fn write_config(
+    root: &Path,
+    name: &str,
+    version: &str,
+    main_class: &str,
+    class_dir: &str,
+) -> Result<()> {
+    let config = Config {
+        name: name.to_string(),
+        version: version.to_string(),
+        main_class: main_class.to_string(),
+        class_dir: class_dir.to_string(),
+    };
+    fs::write(root.join("bloomery.toml"), toml::to_string_pretty(&config)?)?;
+    Ok(())
+}
 
 pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
     let project_name = name.unwrap_or_else(|| "bloomery-project".to_string());
@@ -15,31 +33,36 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
     // process extern templates
     if let Some(ext_template) = load_external_template(template_name)? {
         for dir in &ext_template.dirs {
+            crate::templates::external::template_relative_path(dir)?;
+        }
+        for file in &ext_template.files {
+            if file.path != "bloomery.toml" {
+                crate::templates::external::template_relative_path(&file.path)?;
+            }
+        }
+
+        fs::create_dir_all(root)?;
+        for dir in &ext_template.dirs {
             fs::create_dir_all(root.join(dir))?;
         }
 
-        let config = format!(
-            r#"# name of your project
-name = "{}"
-# Version of your project
-version = "0.1.0"
-# class, which will run
-main_class = "{}"
-# directory where your .class files are located
-class_dir = "{}"
-"#,
-            project_name, ext_template.main_class, ext_template.class_dir
-        );
-        fs::write(root.join("bloomery.toml"), config)?;
+        write_config(
+            root,
+            &project_name,
+            &ext_template.version,
+            &ext_template.main_class,
+            &ext_template.class_dir,
+        )?;
 
         for file in &ext_template.files {
             if file.path == "bloomery.toml" {
                 continue;
             }
-            if let Some(parent) = Path::new(&file.path).parent() {
+            let path = crate::templates::external::template_relative_path(&file.path)?;
+            if let Some(parent) = path.parent() {
                 fs::create_dir_all(root.join(parent))?;
             }
-            fs::write(root.join(&file.path), &file.content)?;
+            fs::write(root.join(path), &file.content)?;
         }
 
         info!(
@@ -59,23 +82,18 @@ class_dir = "{}"
         )
     })?;
 
+    fs::create_dir_all(root)?;
     for dir in template.dirs {
         fs::create_dir_all(root.join(dir))?;
     }
 
-    let config = format!(
-        r#"# name of the project
-name = "{}"
-# Version of the project
-version = "0.1.0"
-# class to run
-main_class = "{}"
-# directory where your .class files are located
-class_dir = "{}"
-"#,
-        project_name, template.main_class, template.class_dir
-    );
-    fs::write(root.join("bloomery.toml"), config)?;
+    write_config(
+        root,
+        &project_name,
+        "0.1.0",
+        template.main_class,
+        template.class_dir,
+    )?;
 
     for file in template.files {
         fs::write(root.join(file.path), file.content)?;

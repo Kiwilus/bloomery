@@ -1,8 +1,10 @@
-use anyhow::Result;
+use anyhow::{Context, Result, bail};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
+
+use crate::config::Config;
 
 // structs for custom, installed templates, as toml
 #[derive(Debug, Serialize, Deserialize)]
@@ -16,6 +18,8 @@ pub struct StoredTemplate {
     pub name: String,
     pub dirs: Vec<String>,
     pub files: Vec<StoredFile>,
+    #[serde(default = "default_version")]
+    pub version: String,
     pub main_class: String,
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
@@ -23,6 +27,46 @@ pub struct StoredTemplate {
 
 fn default_class_dir() -> String {
     "target/classes".to_string()
+}
+
+fn default_version() -> String {
+    "0.1.0".to_string()
+}
+
+fn validate_template_name(name: &str) -> Result<()> {
+    let path = Path::new(name);
+    if name.is_empty()
+        || path.components().count() != 1
+        || !matches!(path.components().next(), Some(Component::Normal(_)))
+    {
+        bail!("Template name must be a single file name");
+    }
+    Ok(())
+}
+
+pub fn template_relative_path(path: &str) -> Result<&Path> {
+    let path = Path::new(path);
+    if path.as_os_str().is_empty()
+        || !path
+            .components()
+            .all(|component| matches!(component, Component::Normal(_)))
+    {
+        bail!("Template paths must be relative and must not contain '.' or '..'");
+    }
+    Ok(path)
+}
+
+fn load_template_config(source_dir: &Path) -> Result<(String, String, String)> {
+    let path = source_dir.join("bloomery.toml");
+    if !path.exists() {
+        return Ok((default_version(), "Main".to_string(), "bin".to_string()));
+    }
+
+    let content =
+        fs::read_to_string(&path).with_context(|| format!("Could not read {}", path.display()))?;
+    let config: Config =
+        toml::from_str(&content).with_context(|| format!("Could not parse {}", path.display()))?;
+    Ok((config.version, config.main_class, config.class_dir))
 }
 
 // get template directory
@@ -36,21 +80,27 @@ pub fn get_templates_dir() -> Result<PathBuf> {
 
 // install a directory as a system-wide template
 pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
+    validate_template_name(&name)?;
     if !source_dir.exists() {
         error!("Source directory '{}' does not exist", source_dir.display());
+    }
+    if !source_dir.is_dir() {
+        error!("Source path '{}' is not a directory", source_dir.display());
     }
 
     let mut dirs = Vec::new();
     let mut files = Vec::new();
 
     collect_template_assets(source_dir, source_dir, &mut dirs, &mut files)?;
+    let (version, main_class, class_dir) = load_template_config(source_dir)?;
 
     let template_data = StoredTemplate {
         name: name.clone(),
         dirs,
         files,
-        main_class: "Main".to_string(),
-        class_dir: "bin".to_string(),
+        version,
+        main_class,
+        class_dir,
     };
 
     let target_path = get_templates_dir()?.join(format!("{}.toml", name));
@@ -80,19 +130,27 @@ fn collect_template_assets(
     for entry in fs::read_dir(current)? {
         let entry = entry?;
         let path = entry.path();
+        let file_type = entry.file_type()?;
         let relative = path.strip_prefix(base)?.to_string_lossy().to_string();
 
-        if path.is_dir() {
-            dirs.push(relative);
-            collect_template_assets(base, &path, dirs, files)?;
-        } else if path.is_file() {
-            if relative.starts_with(".git")
-                || relative.starts_with("target")
-                || relative.starts_with("bin")
+        if file_type.is_symlink() {
+            error!(
+                "Template contains unsupported symbolic link: {}",
+                path.display()
+            );
+        }
+
+        if file_type.is_dir() {
+            if current == base
+                && matches!(entry.file_name().to_str(), Some(".git" | "target" | "bin"))
             {
                 continue;
             }
-            let content = fs::read_to_string(&path).unwrap_or_default();
+            dirs.push(relative);
+            collect_template_assets(base, &path, dirs, files)?;
+        } else if file_type.is_file() {
+            let content = fs::read_to_string(&path)
+                .with_context(|| error!("Template file is not valid UTF-8: {}", path.display()))?;
             files.push(StoredFile {
                 path: relative,
                 content,
@@ -103,6 +161,7 @@ fn collect_template_assets(
 }
 
 pub fn load_external_template(name: &str) -> Result<Option<StoredTemplate>> {
+    validate_template_name(name)?;
     let template_path = get_templates_dir()?.join(format!("{}.toml", name));
     if !template_path.exists() {
         return Ok(None);
