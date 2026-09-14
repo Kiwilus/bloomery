@@ -26,6 +26,12 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
     let project_name = name.unwrap_or_else(|| "bloomery-project".to_string());
     let root = Path::new(&project_name);
 
+    // Extract project name from the path so long paths are supported
+    let config_name = root
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or(&project_name);
+
     if root.exists() {
         error!("'{}' already exists", project_name);
     }
@@ -48,7 +54,7 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
 
         write_config(
             root,
-            &project_name,
+            config_name,
             &ext_template.version,
             &ext_template.main_class,
             &ext_template.class_dir,
@@ -89,7 +95,7 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
 
     write_config(
         root,
-        &project_name,
+        config_name,
         "0.1.0",
         template.main_class,
         template.class_dir,

@@ -66,6 +66,7 @@ pub fn load_global_config() -> anyhow::Result<GlobalConfig> {
     Ok(toml::from_str(&content)?)
 }
 
+/*
 // write global config to the disk
 pub fn save_global_config(cfg: &GlobalConfig) -> anyhow::Result<()> {
     let path = global_config_path()?;
@@ -75,3 +76,4 @@ pub fn save_global_config(cfg: &GlobalConfig) -> anyhow::Result<()> {
     fs::write(path, toml::to_string_pretty(cfg)?)?;
     Ok(())
 }
+*/
