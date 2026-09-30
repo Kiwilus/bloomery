@@ -11,6 +11,7 @@ mod templates;
 
 use cli::{Cli, Commands};
 
+// main function, selection which function is called
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
