@@ -17,11 +17,6 @@ blm build
 
 > it will build all java files in your source directory
 
-If you want to build just 1 file directly you can use:
-
-```bash
-blm build-file <file_to_build>
-```
 
 ### Run the project:
 
@@ -29,13 +24,23 @@ blm build-file <file_to_build>
 blm run
 ```
 
-> it will run all java files in your source directory
+> it will build all java files in your source directory and run the .class, set in your bloomery.toml as main_class
+
+### Run or build just a single Java file
+
+If you want to build just 1 file directly you can use:
+
+```bash
+blm build-file <file_to_build>
+```
 
 If you want to run just 1 file directly you can use:
 
 ```bash
 blm run-file <file_to_run>
 ```
+
+> for these operations you don't need a bloomery.toml. Bloomery will create a `bin` folder and store there your compiled files.
 
 ### Clean your project
 
@@ -58,4 +63,4 @@ main_class = "Main"
 class_dir = "out"
 ```
 
-If you want to run an other main class, change your copilation folder, change your projects version or rename your project, do it in the `bloomery.toml`.
+If you want to run an other main class, change your compilation folder, change your projects version or rename your project, do it in the `bloomery.toml`.

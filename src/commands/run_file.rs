@@ -4,9 +4,7 @@ use std::path::Path;
 use std::process::Command;
 
 use super::build_file;
-use crate::config::load_config;
 
-// Read the package name from a Java file if present
 fn get_full_name(path: &Path) -> Result<String> {
     let content = fs::read_to_string(path)?;
     let class_name = path
@@ -17,7 +15,6 @@ fn get_full_name(path: &Path) -> Result<String> {
     for line in content.lines() {
         let line = line.trim();
 
-        // Find the package declaration
         if line.starts_with("package ") && line.ends_with(';') {
             let package = line
                 .trim_start_matches("package ")
@@ -27,7 +24,6 @@ fn get_full_name(path: &Path) -> Result<String> {
             return Ok(format!("{}.{}", package, class_name));
         }
 
-        // stop once the code begins
         if !line.is_empty()
             && !line.starts_with("//")
             && !line.starts_with("/*")
@@ -37,7 +33,6 @@ fn get_full_name(path: &Path) -> Result<String> {
         }
     }
 
-    // when no package found use class name
     Ok(class_name.to_string())
 }
 
@@ -45,15 +40,15 @@ pub fn run_file(path: &Path) -> Result<()> {
     // First build the file
     build_file::build_file(path)?;
 
-    let config = load_config()?;
     let fqn = get_full_name(path)?;
 
     info!("Starting {} ...", fqn);
 
-    // java command to run .class: java -cp <class_dir> <full_name>
+    // java command to run .class: java -cp bin <full_name>
+    // the bin directory is hard coded as in build_file.rs
     let status = match Command::new("java")
         .arg("-cp")
-        .arg(&config.class_dir)
+        .arg("bin")
         .arg(&fqn)
         .status()
     {

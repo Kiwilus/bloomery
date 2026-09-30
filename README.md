@@ -12,7 +12,7 @@
 
 ---
 
-Bloomery is a easy and minimalist build system for Java projects written in Rust.
+Bloomery is an easy and minimalist build system for Java projects written in Rust.
 It is designed to make creating, building and running simple Java projects easy and just working.
 
 I started Bloomery because I am learning Java at school and wanted something similar to Maven, but much simpler.

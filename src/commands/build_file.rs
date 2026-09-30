@@ -2,8 +2,6 @@ use anyhow::Result;
 use std::path::Path;
 use std::process::Command;
 
-use crate::config::load_config;
-
 pub fn build_file(path: &Path) -> Result<()> {
     let file = Path::new(path);
 
@@ -11,13 +9,15 @@ pub fn build_file(path: &Path) -> Result<()> {
         error!("File not found at: {}", path.display());
     }
 
-    let config = load_config()?;
+    let bin_dir = "bin/";
+    // hard coded bin directory
+    std::fs::create_dir_all(bin_dir)?;
 
-    std::fs::create_dir_all(&config.class_dir)?;
-
+    // at this point the /bin directory is hard coded again,
+    // because the run-file and build-file command should work withoit the bloomery.toml.
     let status = match Command::new("javac")
         .arg("-d")
-        .arg(&config.class_dir) // no hard coded bin/ directory
+        .arg(bin_dir)
         .arg("-encoding")
         .arg("UTF-8")
         .arg(file)

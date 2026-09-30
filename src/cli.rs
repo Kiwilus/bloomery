@@ -11,7 +11,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    // create new Java project
+    /// create new Java project
     Init {
         // naming process is optional
         name: Option<String>,
@@ -20,27 +20,23 @@ pub enum Commands {
         #[arg(short, long)]
         template: Option<String>,
     },
-    // install a directory as a system-wide template
+    /// install a directory as a system-wide template
     Install {
         // Name of the template to install
         #[arg(short, long)]
         name: String,
-        // Path to the directory to use as template, default is '.'
+        // Path to the directory to use as template, default is your current
         #[arg(short, long, default_value = ".")]
         path: PathBuf,
     },
-    // clean, remove bin or target directory
+    /// clean, remove bin or target directory
     Clean,
-    // compilation process
+    /// compilation process
     Build,
-    // build single file
-    BuildFile {
-        path: PathBuf,
-    },
-    // execution process
+    /// build single file
+    BuildFile { path: PathBuf },
+    /// execution process
     Run,
-    // run single file
-    RunFile {
-        path: PathBuf,
-    },
+    /// run single file
+    RunFile { path: PathBuf },
 }
