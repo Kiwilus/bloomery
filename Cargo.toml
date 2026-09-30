@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 repository = "https://github.com/Kiwilus/bloomery.git"
 readme = "README.md"
-describtion = "A lightweight, minimalist build system for Java written in Rust."
+description = "A lightweight, minimalist build system for Java written in Rust."
 keywords = ["Java", "build-system", "tool"]
 
 [dependencies]
