@@ -1,5 +1,5 @@
 [package]
-name = "blm"
+name = "bloomery"
 version = "1.6.4"
 edition = "2024"
 license = "MIT"
