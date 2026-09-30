@@ -6,6 +6,7 @@
 
 [![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/bloomery.svg)](https://crates.io/crates/bloomery)
 [![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow.svg)](#)
 
 </div>
@@ -27,13 +28,21 @@ Bloomery is my attempt at making a small tool that does what I need and nothing 
 
 To install bloomery on your system:
 
-clone the repo and change into it:
+#### from crates.io:
+
+```bash
+cargo install bloomery
+```
+
+#### or install it from source:
+
+clone the repo and change into it
 
 ```bash
 git clone https://github.com/Kiwilus/bloomery.git && cd bloomery
 ```
 
-install bloomery system wide:
+install bloomery system wide
 
 ```bash
 cargo install --path .
