@@ -34,11 +34,13 @@ If you want to build just 1 file directly you can use:
 blm build-file <file_to_build>
 ```
 
-If you want to run just 1 file directly you can use:
+If you want to run just 1 file , without compiling it and creating a `bin` directory, you can use:
 
 ```bash
 blm run-file <file_to_run>
 ```
+
+this will will execute `java <your_file>`, you dont need javac for this.
 
 > for these operations you don't need a bloomery.toml. Bloomery will create a `bin` folder and store there your compiled files.
 

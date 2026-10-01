@@ -10,6 +10,8 @@ macro_rules! info {
     }};
 }
 
+/*
+ * the warn macro is not even used LMAO
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {{
@@ -17,6 +19,7 @@ macro_rules! warn {
         println!("{} {}", "WARN:".yellow().bold(), format!($($arg)*));
     }};
 }
+*/
 
 #[macro_export]
 macro_rules! error {
