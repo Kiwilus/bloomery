@@ -20,7 +20,7 @@ pub enum Commands {
         #[arg(short, long)]
         template: Option<String>,
     },
-    /// install a directory as a system-wide template
+    /// install a java project directory as a system-wide template
     Install {
         // Name of the template to install
         #[arg(short, long)]
@@ -30,11 +30,22 @@ pub enum Commands {
         path: PathBuf,
     },
     /// clean, remove bin or target directory
-    Clean,
+    Clean {
+        /// Additional directories to remove
+        #[arg(value_name = "DIR")]
+        clean_dirs: Vec<PathBuf>,
+    },
     /// compilation process
     Build,
     /// build single file
-    BuildFile { path: PathBuf },
+    BuildFile {
+        path: PathBuf,
+
+        /// Dynamic directory where compiled files are stored
+        /// when no output directory is given, the file will be compiled in your current directory
+        #[arg(short, long, default_value = ".")]
+        output: PathBuf,
+    },
     /// execution process
     Run,
     /// run single file

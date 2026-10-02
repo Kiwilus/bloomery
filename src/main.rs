@@ -28,7 +28,7 @@ fn main() -> Result<()> {
         }
         Commands::Install { name, path } => templates::external::install_template(name, &path)?,
         Commands::Build => commands::build::build()?,
-        Commands::BuildFile { path } => commands::build_file::build_file(&path)?,
+        Commands::BuildFile { path, output } => commands::build_file::build_file(&path, &output)?,
         Commands::Run => {
             commands::build::build()?;
             commands::run::run()?;
@@ -36,7 +36,9 @@ fn main() -> Result<()> {
         Commands::RunFile { path } => {
             commands::run_file::run_file(&path)?;
         }
-        Commands::Clean => commands::clean::clean()?,
+        Commands::Clean { clean_dirs } => {
+            commands::clean::clean(&clean_dirs)?;
+        }
     }
 
     Ok(())

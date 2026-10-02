@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -39,7 +39,7 @@ fn validate_template_name(name: &str) -> Result<()> {
         || path.components().count() != 1
         || !matches!(path.components().next(), Some(Component::Normal(_)))
     {
-        bail!("Template name must be a single file name");
+        error!("Template name must be a single file name");
     }
     Ok(())
 }
@@ -51,7 +51,7 @@ pub fn template_relative_path(path: &str) -> Result<&Path> {
             .components()
             .all(|component| matches!(component, Component::Normal(_)))
     {
-        bail!("Template paths must be relative and must not contain '.' or '..'");
+        error!("Template paths must be relative and must not contain '.' or '..'");
     }
     Ok(path)
 }

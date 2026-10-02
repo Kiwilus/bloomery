@@ -34,15 +34,23 @@ If you want to build just 1 file directly you can use:
 blm build-file <file_to_build>
 ```
 
-If you want to run just 1 file , without compiling it and creating a `bin` directory, you can use:
+your compiled file be stored in your current directory.
+
+you can optionally parse a output directory, where your compiled file should be stored:
+
+```bash
+blm build-file <file_to_build> --output <output_directory>
+```
+
+If you want to run just 1 file , without compiling it and creating a compiled file or output directory, you can use:
 
 ```bash
 blm run-file <file_to_run>
 ```
 
-this will will execute `java <your_file>`, you dont need javac for this.
+this will will execute `java <your_file>` and you dont need javac for this.
 
-> for these operations you don't need a bloomery.toml. Bloomery will create a `bin` folder and store there your compiled files.
+> for these operations you don't need a bloomery.toml.
 
 ### Clean your project
 
@@ -50,9 +58,16 @@ this will will execute `java <your_file>`, you dont need javac for this.
 blm clean
 ```
 
-this will remove the folder, given in class_dir in your bloomery.toml
+this will remove the folder, given in class_dir in your bloomery.toml. When you don't have a bloomery.toml file, the default directory to clean will be `bin`.
+You can clean multiple commands e.g. you have in your bloomery.toml `target` as your class dir, but you have another directory you want to remove e.g. `testdir`
 
-> when no bloomery.toml file is found, it will automaticly delete the bin folder.
+You can clean both directorys in 1 CLI command with:
+
+```bash
+blm clean testdir
+```
+
+this will remove the `target` directory and additionally the `testdir` directory. You can remove as many directorys in 1 command as you want.
 
 ### Configuration
 

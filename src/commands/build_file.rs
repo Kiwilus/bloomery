@@ -2,28 +2,24 @@ use anyhow::Result;
 use std::path::Path;
 use std::process::Command;
 
-// When you use build_file, a 'bin' directory will be created where the compiled file is stored.
-// If you don't want to create a 'bin' directory, you can use the run-file command instead.
-// This will run the Java file directly without creating a 'bin' directory.
-pub fn build_file(path: &Path) -> Result<()> {
-    let file = Path::new(path);
-
-    if !file.exists() {
+// When you use build_file and dont parse an output directory with '--output' after 'build-file',
+// a 'bin' directory will be created in the current working directory where the compiled files are stored.
+// If you don't want to create a output directory, use the run-file command instead. This will run the Java file directly,
+// without creating a output directory.
+pub fn build_file(path: &Path, output_dir: &Path) -> Result<()> {
+    if !path.exists() {
         error!("File not found at: {}", path.display());
     }
 
-    let bin_dir = "bin/";
-    // hard coded bin directory
-    std::fs::create_dir_all(bin_dir)?;
+    std::fs::create_dir_all(output_dir)?;
 
-    // at this point the /bin directory is hard coded again,
-    // because the build-file command should work withoit the bloomery.toml.
+    // The build-file command does not require a bloomery.toml file,
     let status = match Command::new("javac")
         .arg("-d")
-        .arg(bin_dir)
+        .arg(output_dir)
         .arg("-encoding")
         .arg("UTF-8")
-        .arg(file)
+        .arg(path)
         .status()
     {
         Ok(status) => status,
@@ -34,6 +30,6 @@ pub fn build_file(path: &Path) -> Result<()> {
         error!("Compilation failed");
     }
 
-    success!("File build successfully");
+    success!("File built successfully");
     Ok(())
 }
