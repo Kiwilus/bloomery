@@ -36,13 +36,19 @@ pub fn load_config() -> Result<Config> {
     Ok(config)
 }
 
-/*
- * Part for global configuration of the default template in bloomery/config.toml
- */
-#[derive(Debug, Serialize, Deserialize, Default)]
+// Part for global configuration of the default template in bloomery/config.toml
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GlobalConfig {
     #[serde(default = "default_template")]
     pub default_template: String,
+}
+
+impl Default for GlobalConfig {
+    fn default() -> Self {
+        Self {
+            default_template: "default".to_string(),
+        }
+    }
 }
 
 fn default_template() -> String {

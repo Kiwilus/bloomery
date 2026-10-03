@@ -25,7 +25,7 @@ pub fn clean(clean_dirs: &[PathBuf]) -> Result<()> {
     for dir in dirs {
         if dir.exists() {
             fs::remove_dir_all(&dir)?;
-            info!("Cleaned {}/", dir.display());
+            info!("Cleaned {}", dir.display());
         } else {
             info!("Nothing to clean ({} does not exist)", dir.display());
         }
