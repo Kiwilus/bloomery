@@ -66,7 +66,11 @@ fn load_template_config(source_dir: &Path) -> Result<(String, String, String)> {
         fs::read_to_string(&path).with_context(|| format!("Could not read {}", path.display()))?;
     let config: Config =
         toml::from_str(&content).with_context(|| format!("Could not parse {}", path.display()))?;
-    Ok((config.version, config.main_class, config.class_dir))
+    Ok((
+        config.project.version,
+        config.paths.main_class,
+        config.paths.class_dir,
+    ))
 }
 
 // get template directory

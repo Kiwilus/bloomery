@@ -26,20 +26,23 @@ fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
 // build function to compile java code
 pub fn build() -> Result<()> {
     let config = load_config()?;
-    info!("Building project '{}' v{}", config.name, config.version);
+    info!(
+        "Building project '{}' v{}",
+        config.project.name, config.project.version
+    );
 
     let src_dir = Path::new("src");
     let java_files = find_java_files(src_dir)?;
 
     if java_files.is_empty() {
-        error!("No .java file found at src/");
+        error!("No .java file found at src");
     }
 
-    fs::create_dir_all(&config.class_dir)?;
+    fs::create_dir_all(&config.paths.class_dir)?;
 
     let status = match Command::new("javac")
         .arg("-d")
-        .arg(&config.class_dir)
+        .arg(&config.paths.class_dir)
         .arg("-encoding")
         .arg("UTF-8")
         .args(&java_files)

@@ -74,8 +74,11 @@ this will remove the `target` directory and additionally the `testdir` directory
 The project configuration is stored in `bloomery.toml`:
 
 ```toml
+[project]
 name = "my-project"
 version = "0.1.0"
+
+[paths]
 main_class = "Main"
 class_dir = "out"
 ```

@@ -65,4 +65,9 @@ See the [Zed configuration](docs/zed-configuration.md).
 - JDK
 - `javac` and `java` in your PATH
 
+## Contributing
+
+Contributions are welcome!  
+If you want to contribute, please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
 Bloomery is still a work in progress.

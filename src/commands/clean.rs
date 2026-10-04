@@ -13,7 +13,7 @@ use std::path::PathBuf;
 */
 pub fn clean(clean_dirs: &[PathBuf]) -> Result<()> {
     let default_dir = match load_config() {
-        Ok(config) => PathBuf::from(config.class_dir),
+        Ok(config) => PathBuf::from(config.paths.class_dir),
         Err(_) => PathBuf::from("bin"),
     };
 

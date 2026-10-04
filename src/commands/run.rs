@@ -6,12 +6,12 @@ use crate::config::load_config;
 // run compiled java code
 pub fn run() -> Result<()> {
     let config = load_config()?;
-    info!("Starting {} ...", config.main_class);
+    info!("Starting {} ...", config.paths.main_class);
 
     let status = match Command::new("java")
         .arg("-cp")
-        .arg(config.class_dir)
-        .arg(&config.main_class)
+        .arg(config.paths.class_dir)
+        .arg(&config.paths.main_class)
         .status()
     {
         Ok(status) => status,

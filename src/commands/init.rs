@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-use crate::config::Config;
+use crate::config::{Config, Paths, Project};
 use crate::templates::{builtin::get_templates, external::load_external_template};
 
 fn write_config(
@@ -13,10 +13,14 @@ fn write_config(
     class_dir: &str,
 ) -> Result<()> {
     let config = Config {
-        name: name.to_string(),
-        version: version.to_string(),
-        main_class: main_class.to_string(),
-        class_dir: class_dir.to_string(),
+        project: Project {
+            name: name.to_string(),
+            version: version.to_string(),
+        },
+        paths: Paths {
+            main_class: main_class.to_string(),
+            class_dir: class_dir.to_string(),
+        },
     };
     fs::write(root.join("bloomery.toml"), toml::to_string_pretty(&config)?)?;
     Ok(())

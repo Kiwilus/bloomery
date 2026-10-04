@@ -7,19 +7,26 @@ use std::path::PathBuf;
 /*
  * Part for the bloomery.toml configuration
  */
-// struct for the bloomery.toml file
+
+// struct for the bloomery.toml sections
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    // project name
+    // toml topics
+    pub project: Project,
+    pub paths: Paths,
+}
+
+// 'Project' section from the sections struct
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Project {
     pub name: String,
-
-    // project version
     pub version: String,
+}
 
-    // main class
+// 'Paths' section from the sections struct
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Paths {
     pub main_class: String,
-
-    // directory where the compiled classes are located
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
 }

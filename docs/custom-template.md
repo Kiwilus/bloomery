@@ -22,8 +22,11 @@ Include a `bloomery.toml` file inside your template directory to pre-define proj
 
 ```toml
 # bloomery.toml inside your template folder
+[project]
 name = "template-project"
 version = "0.1.0"
+
+[paths]
 main_class = "com.example.App"
 class_dir = "bin"
 ```
