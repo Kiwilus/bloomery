@@ -19,12 +19,12 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
     let mut map = HashMap::new();
 
     /*
-     * This is a minimal template, the default
+     * This is a minimal template
      */
     map.insert(
-        "default",
+        "minimal",
         ProjectTemplate {
-            name: "default",
+            name: "minimal",
             dirs: &["src", "bin"],
             main_class: "Main",
             class_dir: "bin",
@@ -35,7 +35,26 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
                 },
                 FileTemplate {
                     path: ".gitignore",
-                    content: "/bin/\n*.class\n",
+                    content: "bin/\n*.class\n",
+                },
+            ],
+        },
+    );
+
+    /*
+     * This is the new default template, with a lib directory
+     */
+    map.insert(
+        "default",
+        ProjectTemplate {
+            name: "default",
+            dirs: &["src", "lib", "bin"],
+            main_class: "Main",
+            class_dir: "bin",
+            files: &[
+                FileTemplate{
+                    path: "src/Main.java",
+                    content: "public class Main {\n    public static void main(String[] args) {\n   System.out.println(\"Hello, World\");\n    }\n}\n",
                 },
             ],
         },
@@ -58,7 +77,7 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
                 },
                 FileTemplate {
                     path: ".gitignore",
-                    content: "/target/\n*.class\n",
+                    content: "target/\n*.class\n",
                 },
             ],
         },

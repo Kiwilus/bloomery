@@ -11,9 +11,10 @@ use std::path::PathBuf;
 // struct for the bloomery.toml sections
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    // toml topics
+    // toml sections
     pub project: Project,
     pub paths: Paths,
+    pub dependencies: Dependencies,
 }
 
 // 'Project' section from the sections struct
@@ -29,6 +30,12 @@ pub struct Paths {
     pub main_class: String,
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
+}
+
+// 'Dependencies' section from the sections struct
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Dependencies {
+    pub jars: Vec<String>,
 }
 
 // default class directory

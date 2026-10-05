@@ -29,12 +29,16 @@ version = "0.1.0"
 [paths]
 main_class = "com.example.App"
 class_dir = "bin"
+
+[dependencies]
+jars = []
 ```
 
 `name` is the name of your project
 `version` is the version of your project
 `main_class` is the class to run with the run command
 `class_dir` is the directory where your .class files are stored like bin or target/classes
+`jars` are your optional dependencies
 
 ---
 

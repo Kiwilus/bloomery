@@ -4,7 +4,7 @@
 blm init <my-new-java-project>
 ```
 
-This will create a folder with a Java template. You have 2 builtin templates. A classic/easy one and an advanced maven like template. You can install and use a custom template.
+This will create a folder with a Java template. You have 3 builtin templates. An easy/minimalist one, an classic one and an advanced maven like template. If you want, you can install and use a custom template.
 You can lookup how to install and use a custom template [here.](docs/custom-template.md)
 
 > If no project name is given, `blm init` creates a project called `bloomery-project`.
@@ -81,6 +81,11 @@ version = "0.1.0"
 [paths]
 main_class = "Main"
 class_dir = "out"
+
+[dependencies]
+jars = []
 ```
 
-If you want to run an other main class, change your compilation folder, change your projects version or rename your project, do it in the `bloomery.toml`.
+If you want to run an other main class, change your compilation folder, change your projects version, parse a dependencie or rename your project, do it in the bloomery.toml.
+
+> If you want to add external dependencies, see the full Dependencies guide for [how to add external JARs](docs/dependencies.md).

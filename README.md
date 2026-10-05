@@ -22,6 +22,16 @@ I don't need millions of features, complicated configuration or a huge build sys
 
 Bloomery is my attempt at making a small tool that does what I need and nothing more.
 
+## Features
+
+- **Easy to use**
+- **Lightweight**
+- **TOML configuration**
+- **Single file execution**
+- **Configurable output**
+- **External dependencies to classpath**
+- **Built in templates for different use-cases**
+- **Install custom templates**
 ---
 
 ## Installation
@@ -52,6 +62,7 @@ cargo install --path .
 
 - [Usage](docs/usage.md)
 - [Custom Templates](docs/custom-template.md)
+- [Dependencies](docs/dependencies.md)
 
 ## How I use bloomery with zed
 
