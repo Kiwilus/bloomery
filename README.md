@@ -22,16 +22,20 @@ I don't need millions of features, complicated configuration or a huge build sys
 
 Bloomery is my attempt at making a small tool that does what I need and nothing more.
 
+--- 
+
 ## Features
 
 - **Easy to use**
 - **Lightweight**
 - **TOML configuration**
 - **Single file execution**
+- **Easilly build and run .jar files**
 - **Configurable output**
 - **External dependencies to classpath**
 - **Built in templates for different use-cases**
 - **Install custom templates**
+
 ---
 
 ## Installation
@@ -74,7 +78,7 @@ See the [Zed configuration](docs/zed-configuration.md).
 
 - Rust
 - JDK
-- `javac` and `java` in your PATH
+- `javac`, `java` and `jar` in your PATH
 
 ## Contributing
 

@@ -28,7 +28,7 @@ blm run
 
 ### Run or build just a single Java file
 
-If you want to build just 1 file directly you can use:
+If you want to build just 1 file directly, you can use:
 
 ```bash
 blm build-file <file_to_build>
@@ -51,6 +51,24 @@ blm run-file <file_to_run>
 this will will execute `java <your_file>` and you dont need javac for this.
 
 > for these operations you don't need a bloomery.toml.
+
+### build and run .jar files
+
+If you want to build a jar file, you can use:
+
+```bash
+blm build-jar
+```
+
+> This will build your code into java-bytecode, extract your optional external dependencies and package it all in one .jar file
+
+You can run an existing .jar file with:
+
+```bash
+blm run-jar <your_jar_file>
+```
+
+> If no jar file is parsed, bloomery will take the name of your directory, but it will not build a jar file like the run command
 
 ### Clean your project
 

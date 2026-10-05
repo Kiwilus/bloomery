@@ -39,6 +39,12 @@ fn main() -> Result<()> {
         Commands::Clean { clean_dirs } => {
             commands::clean::clean(&clean_dirs)?;
         }
+        Commands::RunJar { jar } => {
+            commands::run_jar::run_jar(jar)?;
+        }
+        Commands::BuildJar => {
+            commands::build_jar::package()?;
+        }
     }
 
     Ok(())

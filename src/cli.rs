@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "bloomery")]
-#[command(about = "build system for Java, easy and just works")]
+#[command(about = "bloomery is a build system for Java, easy and just works")]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
@@ -50,4 +50,8 @@ pub enum Commands {
     Run,
     /// run single file
     RunFile { path: PathBuf },
+    /// run .jar file
+    RunJar { jar: Option<String> },
+    /// compile project into .jar file
+    BuildJar,
 }

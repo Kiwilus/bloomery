@@ -1,13 +1,14 @@
 use anyhow::Result;
 use std::process::Command;
 
-use crate::commands::build::{build_classpath, check_jars};
+use crate::commands::build::build_classpath;
 use crate::config::load_config;
 
 // run compiled java code
 pub fn run() -> Result<()> {
     let config = load_config()?;
 
+    /*
     // make sure all JARs exists before start
     check_jars(&config)?;
 
@@ -22,6 +23,7 @@ pub fn run() -> Result<()> {
             }
         );
     }
+    */
 
     let classpath = build_classpath(&config);
 
