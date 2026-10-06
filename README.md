@@ -30,7 +30,7 @@ Bloomery is my attempt at making a small tool that does what I need and nothing 
 - **Lightweight**
 - **TOML configuration**
 - **Single file execution**
-- **Easilly build and run .jar files**
+- **Easily build and run .jar files**
 - **Configurable output**
 - **External dependencies to classpath**
 - **Built in templates for different use-cases**

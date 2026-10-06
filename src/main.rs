@@ -42,8 +42,8 @@ fn main() -> Result<()> {
         Commands::RunJar { jar } => {
             commands::run_jar::run_jar(jar)?;
         }
-        Commands::BuildJar => {
-            commands::build_jar::package()?;
+        Commands::BuildJar { output } => {
+            commands::build_jar::package(&output)?;
         }
     }
 

@@ -7,22 +7,20 @@ use crate::commands::build::{build, check_jars};
 use crate::config::load_config;
 
 // packages everything into a jar, including jars from the toml
-pub fn package() -> Result<()> {
+pub fn package(output_dir: &Path) -> Result<()> {
     // build first so the class files exist
     build()?;
 
     let config = load_config()?;
     check_jars(&config)?;
 
-    let jar_name = format!("{}.jar", config.project.name);
-    let class_dir = Path::new(&config.paths.class_dir);
+    // create output directory
+    fs::create_dir_all(output_dir)?;
 
-    if !class_dir.exists() {
-        error!(
-            "class dir '{}' does not exist, did you build already?",
-            config.paths.class_dir
-        );
-    }
+    let jar_name = format!("{}.jar", config.project.name);
+    let output_jar = output_dir.join(&jar_name);
+
+    let class_dir = Path::new(&config.paths.class_dir);
 
     // temp directory for fat jar
     let temp_dir = PathBuf::from(".bloomery_package_tmp");
@@ -36,12 +34,15 @@ pub fn package() -> Result<()> {
 
     // unpack external jars and include them
     if !config.dependencies.jars.is_empty() {
-        info!("adding {} external jars...", config.dependencies.jars.len());
+        if config.dependencies.jars.len() == 1 {
+            info!("adding external jar...");
+        } else {
+            info!("adding {} external jars...", config.dependencies.jars.len());
+        }
 
         for jar in &config.dependencies.jars {
             info!("extracting {} ...", jar);
 
-            // make path absolute so it still works when we change current_dir
             let jar_path = Path::new(jar)
                 .canonicalize()
                 .map_err(|_| error!("could not find jar: {}", jar))?;
@@ -62,11 +63,11 @@ pub fn package() -> Result<()> {
     }
 
     // create the final jar
-    info!("creating {} ...", jar_name);
+    info!("creating {} ...", output_jar.display());
 
     let status = Command::new("jar")
         .arg("cfe")
-        .arg(&jar_name)
+        .arg(&output_jar)
         .arg(&config.paths.main_class)
         .arg("-C")
         .arg(&temp_dir)
@@ -78,7 +79,8 @@ pub fn package() -> Result<()> {
 
     match status {
         Ok(s) if s.success() => {
-            success!("Package created: {}", jar_name);
+            success!("Package created: {}", output_jar.display());
+
             if !config.dependencies.jars.is_empty() {
                 info!("(fat jar with all dependencies included)");
             }
@@ -91,7 +93,6 @@ pub fn package() -> Result<()> {
     Ok(())
 }
 
-// simple recursive copy
 fn copy_dir_all(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)?;
     for entry in fs::read_dir(src)? {

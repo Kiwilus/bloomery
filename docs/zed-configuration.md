@@ -31,6 +31,11 @@ This way, I can run or build Java projects or single files using Zed without goi
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
+    "label": "BLM Build JAR",
+    "command": "blm build-jar"
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
     "label": "BLM Clean",
     "command": "blm clean",
     "cwd": "$ZED_WORKTREE_ROOT"
@@ -71,6 +76,12 @@ I like to use the combination between the CTRL key and the number keys.
       "task::Spawn",
       {
         "task_name": "BLM Build"
+      }
+    ],
+    "ctrl-5": [
+      "task::Spawn",
+      {
+        "task_name": "BLM Build JAR"
       }
     ],
     "ctrl-4": [

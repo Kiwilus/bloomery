@@ -14,6 +14,7 @@ pub struct Config {
     // toml sections
     pub project: Project,
     pub paths: Paths,
+    #[serde(default)]
     pub dependencies: Dependencies,
 }
 

@@ -53,5 +53,10 @@ pub enum Commands {
     /// run .jar file
     RunJar { jar: Option<String> },
     /// compile project into .jar file
-    BuildJar,
+    BuildJar {
+        /// Dynamic directory where packaged jar is stored
+        /// As in the build-file function, when no output directory is given, the file will be compiled in your current directory
+        #[arg(short, long, default_value = ".")]
+        output: PathBuf,
+    },
 }

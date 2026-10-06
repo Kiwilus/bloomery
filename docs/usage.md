@@ -62,6 +62,14 @@ blm build-jar
 
 > This will build your code into java-bytecode, extract your optional external dependencies and package it all in one .jar file
 
+Your packaged .jar file will be in your current directory.
+
+You can optionally parse a output directory, where your packaged .jar file will be stored:
+
+```bash
+blm build-jar --output <output_directory>
+```
+
 You can run an existing .jar file with:
 
 ```bash

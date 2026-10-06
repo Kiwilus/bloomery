@@ -6,11 +6,4 @@ under the [dependencies] section. Bloomery then automatically adds them to the c
 jars = ["lib/gson.jar", "lib/lombok.jar"]
 ```
 
-If you don't need any external libraries, just don't fill the `jars` list:
-
-```toml 
-[dependencies]
-jars = []
-```
-
-please don't remove the [dependencies] section, this can cause problems at this moment.
+If you don't need any external libraries, you can remove the `dependencies` section or just don't fill the `jars` list:
