@@ -29,6 +29,7 @@ Bloomery is my attempt at making a small tool that does what I need and nothing 
 - **Easy to use**
 - **Lightweight**
 - **TOML configuration**
+- **Configuration via CLI**
 - **Single file execution**
 - **Easily build and run .jar files**
 - **Configurable output**

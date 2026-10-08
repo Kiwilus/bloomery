@@ -45,6 +45,9 @@ fn main() -> Result<()> {
         Commands::BuildJar { output } => {
             commands::build_jar::package(&output)?;
         }
+        Commands::Set { key, new_value } => {
+            commands::set::set(&key, &new_value)?;
+        }
     }
 
     Ok(())

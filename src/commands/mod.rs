@@ -6,3 +6,4 @@ pub mod init;
 pub mod run;
 pub mod run_file;
 pub mod run_jar;
+pub mod set;

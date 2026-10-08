@@ -59,4 +59,11 @@ pub enum Commands {
         #[arg(short, long, default_value = ".")]
         output: PathBuf,
     },
+    /// set bloomery.toml configuration via CLI
+    Set {
+        /// key to set e.g. version, main_class
+        key: String,
+        /// this is your new value
+        new_value: String,
+    },
 }

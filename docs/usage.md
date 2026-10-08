@@ -115,3 +115,13 @@ jars = []
 If you want to run an other main class, change your compilation folder, change your projects version, parse a dependencie or rename your project, do it in the bloomery.toml.
 
 > If you want to add external dependencies, see the full Dependencies guide for [how to add external JARs](docs/dependencies.md).
+
+### Set configuration values via CLI
+
+You can also configure your project without opening the file:
+
+```bash
+blm set <key_to_change> <your_new_value>
+```
+
+You can change the name, version, main_class and class_dir
