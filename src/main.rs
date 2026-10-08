@@ -7,6 +7,7 @@ mod macros;
 mod cli;
 mod commands;
 mod config;
+mod deps;
 mod templates;
 
 use cli::{Cli, Commands};
@@ -39,8 +40,8 @@ fn main() -> Result<()> {
         Commands::Clean { clean_dirs } => {
             commands::clean::clean(&clean_dirs)?;
         }
-        Commands::RunJar { jar } => {
-            commands::run_jar::run_jar(jar)?;
+        Commands::RunJar { manual_jar: path } => {
+            commands::run_jar::run_jar(path)?;
         }
         Commands::BuildJar { output } => {
             commands::build_jar::package(&output)?;

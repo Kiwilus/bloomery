@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
@@ -36,6 +37,21 @@ pub struct Paths {
 // 'Dependencies' section from the sections struct
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Dependencies {
+    // Local JARs
+    // [dependencies.local]
+    #[serde(default)]
+    pub local: LocalDependencies,
+
+    // Online Maven JARs
+    // [dependencies]
+    #[serde(flatten)]
+    pub managed: HashMap<String, String>,
+}
+
+// list for local JARs
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LocalDependencies {
+    #[serde(default)]
     pub jars: Vec<String>,
 }
 

@@ -1,6 +1,6 @@
 <div>
 
-# Bloomery
+# bloomery
 
 **A lightweight, minimalist build system for Java written in Rust.**
 
@@ -33,7 +33,7 @@ Bloomery is my attempt at making a small tool that does what I need and nothing 
 - **Single file execution**
 - **Easily build and run .jar files**
 - **Configurable output**
-- **External dependencies to classpath**
+- **Managed and manual dependency manegement**
 - **Built in templates for different use-cases**
 - **Install custom templates**
 

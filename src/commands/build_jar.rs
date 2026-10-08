@@ -3,23 +3,22 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::commands::build::{build, check_jars};
+use crate::commands::build::build;
 use crate::config::load_config;
+use crate::deps;
 
-// packages everything into a jar, including jars from the toml
+/// Package the project into a fat JAR (classes + all dependencies).
 pub fn package(output_dir: &Path) -> Result<()> {
-    // build first so the class files exist
+    // build first so the class files exist and ensure that managed FARs are downloaded
     build()?;
 
     let config = load_config()?;
-    check_jars(&config)?;
+    let dependency_jars = deps::resolve_classpath_jars(&config)?;
 
-    // create output directory
     fs::create_dir_all(output_dir)?;
 
     let jar_name = format!("{}.jar", config.project.name);
     let output_jar = output_dir.join(&jar_name);
-
     let class_dir = Path::new(&config.paths.class_dir);
 
     // temp directory for fat jar
@@ -33,20 +32,22 @@ pub fn package(output_dir: &Path) -> Result<()> {
     copy_dir_all(class_dir, &temp_dir)?;
 
     // unpack external jars and include them
-    if !config.dependencies.jars.is_empty() {
-        if config.dependencies.jars.len() == 1 {
-            info!("adding external jar...");
-        } else {
-            info!("adding {} external jars...", config.dependencies.jars.len());
-        }
+    if !dependency_jars.is_empty() {
+        let n = dependency_jars.len();
+        info!(
+            "adding {} external jar{}...",
+            n,
+            if n == 1 { "" } else { "s" }
+        );
 
-        for jar in &config.dependencies.jars {
-            info!("extracting {} ...", jar);
+        for jar in &dependency_jars {
+            info!("extracting {jar} ...");
 
             let jar_path = Path::new(jar)
                 .canonicalize()
-                .map_err(|_| error!("could not find jar: {}", jar))?;
+                .map_err(|_| error!("could not find jar: {jar}"))?;
 
+            // jar xf <jar_path> <temp_dir>
             let status = Command::new("jar")
                 .arg("xf")
                 .arg(&jar_path)
@@ -56,15 +57,15 @@ pub fn package(output_dir: &Path) -> Result<()> {
             match status {
                 Ok(s) if s.success() => {}
                 _ => {
-                    error!("could not extract jar: {}", jar);
+                    error!("could not extract jar: {jar}");
                 }
             }
         }
     }
 
-    // create the final jar
     info!("creating {} ...", output_jar.display());
 
+    // jar cfe <output_jar> <main_class> -C <temp_dir> .
     let status = Command::new("jar")
         .arg("cfe")
         .arg(&output_jar)
@@ -74,19 +75,17 @@ pub fn package(output_dir: &Path) -> Result<()> {
         .arg(".")
         .status();
 
-    // clean up temp directory
     let _ = fs::remove_dir_all(&temp_dir);
 
     match status {
         Ok(s) if s.success() => {
             success!("Package created: {}", output_jar.display());
-
-            if !config.dependencies.jars.is_empty() {
+            if !dependency_jars.is_empty() {
                 info!("(fat jar with all dependencies included)");
             }
         }
         _ => {
-            error!("failed to create jar. is 'jar' in your PATH?");
+            error!("failed to create jar.");
         }
     }
 

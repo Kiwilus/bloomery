@@ -51,7 +51,7 @@ pub enum Commands {
     /// run single file
     RunFile { path: PathBuf },
     /// run .jar file
-    RunJar { jar: Option<String> },
+    RunJar { manual_jar: Option<String> },
     /// compile project into .jar file
     BuildJar {
         /// Dynamic directory where packaged jar is stored

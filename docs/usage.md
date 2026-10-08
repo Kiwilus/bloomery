@@ -109,6 +109,8 @@ main_class = "Main"
 class_dir = "out"
 
 [dependencies]
+
+[dependencies.local]
 jars = []
 ```
 

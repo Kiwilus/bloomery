@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::config::{Config, load_config};
+use crate::deps;
 
 fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
@@ -24,25 +25,21 @@ fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
 }
 
 // build function to compile java code and dependency support
-pub fn build_classpath(config: &Config) -> String {
-    let mut entries: Vec<String> = Vec::new();
+pub fn build_classpath(config: &Config) -> Result<String> {
+    let mut entries = Vec::new();
 
     // Put the output directory first
     entries.push(config.paths.class_dir.clone());
-
-    // append all JARs from dependencies TOML section
-    for jar in &config.dependencies.jars {
-        entries.push(jar.clone());
-    }
+    entries.extend(deps::resolve_classpath_jars(config)?);
 
     // ; on windows and : not on windows
     let separator = if cfg!(windows) { ";" } else { ":" };
-    entries.join(separator)
+    Ok(entries.join(separator))
 }
 
-// Checks whether all specified JARs exist
+// checks that all specified JARs exist
 pub fn check_jars(config: &Config) -> Result<()> {
-    for jar in &config.dependencies.jars {
+    for jar in &config.dependencies.local.jars {
         if !Path::new(jar).exists() {
             error!("Dependency JAR not found: {}", jar);
         }
@@ -61,11 +58,11 @@ pub fn build() -> Result<()> {
     check_jars(&config)?;
 
     // checks if 1 or many dependencies
-    if !config.dependencies.jars.is_empty() {
+    if !config.dependencies.local.jars.is_empty() {
         info!(
             "Including {} dependenc{} in classpath",
-            config.dependencies.jars.len(),
-            if config.dependencies.jars.len() == 1 {
+            config.dependencies.local.jars.len(),
+            if config.dependencies.local.jars.len() == 1 {
                 "y"
             } else {
                 "ies"
@@ -84,9 +81,9 @@ pub fn build() -> Result<()> {
     fs::create_dir_all(&config.paths.class_dir)?;
 
     // build the classpath
-    let classpath = build_classpath(&config);
+    let classpath = build_classpath(&config)?;
 
-    // 4) Run javac with -cp
+    // javac -cp <classpath> -d <class_dir> -encoding UTF-8 <java_files>
     let status = match Command::new("javac")
         .arg("-cp")
         .arg(&classpath)

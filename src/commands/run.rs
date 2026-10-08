@@ -25,7 +25,7 @@ pub fn run() -> Result<()> {
     }
     */
 
-    let classpath = build_classpath(&config);
+    let classpath = build_classpath(&config)?;
 
     info!("Starting {} ...", config.paths.main_class);
 

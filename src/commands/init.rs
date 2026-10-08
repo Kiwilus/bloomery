@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-use crate::config::{Config, Dependencies, Paths, Project};
+use crate::config::{Config, Dependencies, LocalDependencies, Paths, Project};
 use crate::templates::{builtin::get_templates, external::load_external_template};
 
 fn write_config(
@@ -21,9 +21,19 @@ fn write_config(
             main_class: main_class.to_string(),
             class_dir: class_dir.to_string(),
         },
-        dependencies: Dependencies { jars: Vec::new() },
+        dependencies: Dependencies::default(),
     };
-    fs::write(root.join("bloomery.toml"), toml::to_string_pretty(&config)?)?;
+
+    let mut content = toml::to_string_pretty(&config)?;
+
+    if let Some(pos) = content.find("[dependencies.local]") {
+        content.insert_str(pos, "[dependencies]\n\n");
+    } else {
+        content.push_str("\n[dependencies]\n");
+    }
+
+    fs::write(root.join("bloomery.toml"), content)?;
+
     Ok(())
 }
 

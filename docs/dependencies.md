@@ -1,9 +1,43 @@
-Bloomery manages external libraries (JARs) through a simple but effective mechanism: you place your .jar files in a folder of your choice (typically lib/) and list them in your bloomery.toml 
-under the [dependencies] section. Bloomery then automatically adds them to the classpath—both when compiling (javac) and when running (java).
+Bloomery manages external libraries (JARs) through a simple and flexible dependency system. Dependencies can either be downloaded and managed automatically through Maven coordinates, or provided as local `.jar` files.
+
+### Managed dependencies
+
+Managed dependencies are declared directly under the `[dependencies]` section of `bloomery.toml`. Bloomery uses the specified dependency information to resolve and add the required libraries to the classpath when compiling and running your project.
 
 ```toml
 [dependencies]
-jars = ["lib/gson.jar", "lib/lombok.jar"]
+gson = "2.11.0"
+guava = "33.3.1-jre"
 ```
 
-If you don't need any external libraries, you can remove the `dependencies` section or just don't fill the `jars` list:
+Each dependency is specified using its name and version.
+
+### Local JARs
+
+If you already have JAR files locally, you can list them under `[dependencies.local]`. The `jars` list contains paths relative to your project directory.
+
+```toml
+[dependencies.local]
+jars = [
+    "lib/gson.jar",
+    "lib/lombok.jar",
+]
+```
+
+Bloomery automatically adds these JARs to the classpath both when compiling.
+
+You can use managed dependencies and local JARs together:
+
+```toml
+[dependencies]
+gson = "2.11.0"
+
+[dependencies.local]
+jars = [
+    "lib/custom-library.jar",
+]
+```
+
+If you don't need any external libraries, you can remove both sections or simply leave them empty:
+
+The `[dependencies]` section is intended for dependencies managed by Bloomery, while `[dependencies.local]` is specifically for JAR files that are already present in your project.
