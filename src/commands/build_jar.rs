@@ -64,22 +64,42 @@ pub fn package(output_dir: &Path) -> Result<()> {
     }
 
     info!("creating {} ...", output_jar.display());
+    // Custom manifest, Version from bloomery.toml
+    // must be located outside of temp_dir
+    let manifest_path = PathBuf::from(".bloomery_manifest.mf");
+    let manifest_content = format!(
+        "Manifest-Version: 1.0\r\n\
+            Main-Class: {}\r\n\
+            Implementation-Title: {}\r\n\
+            Implementation-Version: {}\r\n\
+            Created-By: bloomery\r\n\
+            \r\n",
+        config.paths.main_class.trim(),
+        config.project.name.trim(),
+        config.project.version.trim()
+    );
+    fs::write(&manifest_path, &manifest_content)?;
 
-    // jar cfe <output_jar> <main_class> -C <temp_dir> .
+    // jar cfm <output_jar> <manifest_path> -C <temp_dir> .
     let status = Command::new("jar")
-        .arg("cfe")
+        .arg("cfm")
         .arg(&output_jar)
-        .arg(&config.paths.main_class)
+        .arg(&manifest_path)
         .arg("-C")
         .arg(&temp_dir)
         .arg(".")
         .status();
 
+    let _ = fs::remove_file(&manifest_path);
     let _ = fs::remove_dir_all(&temp_dir);
 
     match status {
         Ok(s) if s.success() => {
             success!("Package created: {}", output_jar.display());
+            info!(
+                "Manifest: Main-Class={}, Implementation-Version={}",
+                config.paths.main_class, config.project.version
+            );
             if !dependency_jars.is_empty() {
                 info!("(fat jar with all dependencies included)");
             }
@@ -91,7 +111,6 @@ pub fn package(output_dir: &Path) -> Result<()> {
 
     Ok(())
 }
-
 fn copy_dir_all(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)?;
     for entry in fs::read_dir(src)? {
