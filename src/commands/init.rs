@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-use crate::config::{Config, Dependencies, LocalDependencies, Paths, Project};
+use crate::config::{Config, Dependencies, Paths, Project};
 use crate::templates::{builtin::get_templates, external::load_external_template};
 
 fn write_config(

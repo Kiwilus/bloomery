@@ -80,7 +80,7 @@ pub enum DepsAction {
         /// artifactID
         name: String,
         /// version
-        version: String,
+        version: Option<String>,
     },
     /// remove a managed dependency
     Remove { name: String },

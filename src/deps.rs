@@ -27,6 +27,28 @@ struct MavenDoc {
     // version
     #[serde(default)]
     v: String,
+    #[serde(default, rename = "latestVersion")]
+    latest_version: String,
+}
+
+// Resolve the latest version of an artifact on Maven Central
+pub fn resolve_latest_version(artifact: &str) -> Result<String> {
+    let url = format!("https://search.maven.org/solrsearch/select?q=a:{artifact}&rows=5&wt=json");
+
+    let body: MavenSearchResponse = ureq::get(&url)
+        .call()
+        .context("Maven Search API request failed")?
+        .into_json()
+        .context("Failed to parse Maven Search response")?;
+
+    body.response
+        .docs
+        .into_iter()
+        .find(|doc| doc.a == artifact && !doc.latest_version.is_empty())
+        .map(|doc| doc.latest_version)
+        .with_context(|| {
+            error!("Could not resolve latest version for '{artifact}' on Maven Central")
+        })
 }
 
 // Resolve the Maven groupId for an artifact

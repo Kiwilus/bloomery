@@ -1,29 +1,31 @@
 use anyhow::Result;
-use std::fs;
 use std::path::Path;
 
-use crate::config::{Config, load_config, save_config};
+use crate::config::{load_config, save_config};
 
 // Add or update a managed dependency
-pub fn add(name: &str, version: &str) -> Result<()> {
+// if no version in the CLI is given, bloomery will search up the newest version and use it.
+pub fn add(name: &str, version: Option<&str>) -> Result<()> {
     let mut config = load_config()?;
 
-    if config.dependencies.managed.contains_key(name) {
-        info!(
-            "Updating dependency '{}' from {} to {}",
-            name,
-            config.dependencies.managed.get(name).unwrap(),
-            version
-        );
+    let version = match version {
+        Some(v) => v.to_string(),
+        None => {
+            info!("Resolving latest version for '{name}' ...");
+            crate::deps::resolve_latest_version(name)?
+        }
+    };
+
+    if let Some(old) = config.dependencies.managed.get(name) {
+        info!("Updating dependency '{name}' from {old} to {version}");
     }
 
-    // storing the dependency and its version
     config
         .dependencies
         .managed
-        .insert(name.to_string(), version.to_string());
+        .insert(name.to_string(), version.clone());
     save_config(&config)?;
-    info!("Added managed dependency {} = \"{}\"", name, version);
+    success!("Added managed dependency {name} = \"{version}\"");
     Ok(())
 }
 

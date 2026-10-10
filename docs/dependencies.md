@@ -17,6 +17,9 @@ Each dependency is specified using its name and version.
 ```bash
 # Add a managed dependency
 blm deps add <name> <version>
+# or without a specified version
+# bloomery will search up the newest version and use it.
+blm deps add <name>
 
 # Remove a managed dependency
 blm deps remove <name>

@@ -1,7 +1,6 @@
 use anyhow::Result;
-use std::fs;
 
-use crate::config::{Config, load_config, save_config};
+use crate::config::{load_config, save_config};
 
 // set bloomery.toml values via CLI
 // e.g. blm set main_class Main2.java
