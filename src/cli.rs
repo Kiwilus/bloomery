@@ -83,7 +83,12 @@ pub enum DepsAction {
         version: Option<String>,
     },
     /// remove a managed dependency
-    Remove { name: String },
+    Remove {
+        name: String,
+        /// delete downloaded jar
+        #[arg(long, short = 'd')]
+        delete_jar: bool,
+    },
     /// list managed dependencies
     List,
     /// add local JAR path

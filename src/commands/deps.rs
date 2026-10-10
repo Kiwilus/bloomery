@@ -1,4 +1,5 @@
 use anyhow::Result;
+use std::fs;
 use std::path::Path;
 
 use crate::config::{load_config, save_config};
@@ -17,6 +18,10 @@ pub fn add(name: &str, version: Option<&str>) -> Result<()> {
     };
 
     if let Some(old) = config.dependencies.managed.get(name) {
+        if old == &version {
+            warn!("'{name}' = \"{version}\" is already in bloomery.toml");
+            return Ok(());
+        }
         info!("Updating dependency '{name}' from {old} to {version}");
     }
 
@@ -30,15 +35,26 @@ pub fn add(name: &str, version: Option<&str>) -> Result<()> {
 }
 
 // Remove a managed dependency
-pub fn remove(name: &str) -> Result<()> {
+pub fn remove(name: &str, delete_jar: bool) -> Result<()> {
     let mut config = load_config()?;
 
-    if config.dependencies.managed.remove(name).is_none() {
-        error!("Managed dependency '{}' not found", name);
-    }
+    let Some(version) = config.dependencies.managed.remove(name) else {
+        error!("Dependency '{}' not found", name);
+    };
 
     save_config(&config)?;
-    info!("Removed managed dependency '{}'", name);
+    success!("Removed dependency '{}'", name);
+
+    if delete_jar {
+        let jar_path = Path::new("lib").join(format!("{name}-{version}.jar"));
+        if jar_path.exists() {
+            fs::remove_file(&jar_path)?;
+            info!("Deleted {}", jar_path.display());
+        } else {
+            info!("JAR not found: {}", jar_path.display());
+        }
+    }
+
     Ok(())
 }
 
@@ -75,7 +91,7 @@ pub fn add_local(path: &str) -> Result<()> {
 
     // avoid adding the same dependency twice
     if config.dependencies.local.jars.iter().any(|j| j == path) {
-        info!("Local dependency '{}' already present", path);
+        warn!("Local dependency '{}' is already in bloomery.toml", path);
         return Ok(());
     }
 

@@ -23,6 +23,10 @@ blm deps add <name>
 
 # Remove a managed dependency
 blm deps remove <name>
+# if you want, you can remove the JAR file too
+blm deps remove <name> --delete-jar
+# or shorter
+blm deps remove <name> -d
 
 # List all managed dependencies
 blm deps list

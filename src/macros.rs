@@ -10,16 +10,13 @@ macro_rules! info {
     }};
 }
 
-/*
- * the warn macro is not even used LMAO
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {{
         use owo_colors::OwoColorize;
-        println!("{} {}", "WARN:".yellow().bold(), format!($($arg)*));
+        println!("{} {}", "WARNING:".yellow().bold(), format!($($arg)*));
     }};
 }
-*/
 
 #[macro_export]
 macro_rules! error {
