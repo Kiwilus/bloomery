@@ -2,7 +2,7 @@ Bloomery manages external libraries (JARs) through a simple and flexible depende
 
 ### Managed dependencies
 
-Managed dependencies are declared directly under the `[dependencies]` section of `bloomery.toml`. Bloomery uses the specified dependency information to resolve and add the required libraries to the classpath when compiling and running your project.
+Managed dependencies are declared under the 'dependencies' section of bloomery.toml. Bloomery resolves them from Maven Central, downloads the JARs into lib/ when needed, and adds them to the classpath when compiling and running your project.
 
 ```toml
 [dependencies]
@@ -11,6 +11,19 @@ guava = "33.3.1-jre"
 ```
 
 Each dependency is specified using its name and version.
+
+#### CLI
+
+```bash
+# Add a managed dependency
+blm deps add <name> <version>
+
+# Remove a managed dependency
+blm deps remove <name>
+
+# List all managed dependencies
+blm deps list
+```
 
 ### Local JARs
 
@@ -36,6 +49,19 @@ gson = "2.11.0"
 jars = [
     "lib/custom-library.jar",
 ]
+```
+
+#### CLI
+
+```bash
+# Add a local JAR path
+blm deps add-local <path>
+
+# Remove a local JAR path from the config
+blm deps remove-local <path>
+
+# List all local JAR paths
+blm deps list-local
 ```
 
 If you don't need any external libraries, you can remove both sections or simply leave them empty:

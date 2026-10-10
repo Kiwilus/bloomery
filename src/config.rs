@@ -114,3 +114,10 @@ pub fn save_global_config(cfg: &GlobalConfig) -> anyhow::Result<()> {
     Ok(())
 }
 */
+
+// save_config function here now
+pub fn save_config(config: &Config) -> Result<()> {
+    let content = toml::to_string_pretty(config)?;
+    fs::write("bloomery.toml", content)?;
+    Ok(())
+}

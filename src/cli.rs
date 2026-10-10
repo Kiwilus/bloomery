@@ -66,4 +66,33 @@ pub enum Commands {
         /// this is your new value
         new_value: String,
     },
+    /// manage dependencies via CLI
+    Deps {
+        #[command(subcommand)]
+        action: DepsAction,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum DepsAction {
+    /// add a managed dependency
+    Add {
+        /// artifactID
+        name: String,
+        /// version
+        version: String,
+    },
+    /// remove a managed dependency
+    Remove { name: String },
+    /// list managed dependencies
+    List,
+    /// add local JAR path
+    AddLocal {
+        /// path relative to project root
+        path: String,
+    },
+    /// remove a local JAR path
+    RemoveLocal { path: String },
+    /// list local JAR paths
+    ListLocal,
 }

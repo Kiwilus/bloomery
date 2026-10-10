@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::fs;
 
-use crate::config::{Config, load_config};
+use crate::config::{Config, load_config, save_config};
 
 // set bloomery.toml values via CLI
 // e.g. blm set main_class Main2.java
@@ -22,11 +22,5 @@ pub fn set(key: &str, new_value: &str) -> Result<()> {
 
     save_config(&config)?;
     info!("Set {} = {}", key, new_value);
-    Ok(())
-}
-
-fn save_config(config: &Config) -> Result<()> {
-    let content = toml::to_string_pretty(config)?;
-    fs::write("bloomery.toml", content)?;
     Ok(())
 }

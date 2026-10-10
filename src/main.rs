@@ -49,6 +49,14 @@ fn main() -> Result<()> {
         Commands::Set { key, new_value } => {
             commands::set::set(&key, &new_value)?;
         }
+        Commands::Deps { action } => match action {
+            cli::DepsAction::Add { name, version } => commands::deps::add(&name, &version)?,
+            cli::DepsAction::Remove { name } => commands::deps::remove(&name)?,
+            cli::DepsAction::List => commands::deps::list()?,
+            cli::DepsAction::AddLocal { path } => commands::deps::add_local(&path)?,
+            cli::DepsAction::RemoveLocal { path } => commands::deps::remove_local(&path)?,
+            cli::DepsAction::ListLocal => commands::deps::list_local()?,
+        },
     }
 
     Ok(())

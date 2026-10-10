@@ -14,7 +14,6 @@ pub struct ProjectTemplate {
     pub class_dir: &'static str,
 }
 
-// Two templates; an advanced and a default one
 pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
     let mut map = HashMap::new();
 
@@ -42,7 +41,7 @@ pub fn get_templates() -> HashMap<&'static str, ProjectTemplate> {
     );
 
     /*
-     * This is the new default template, with a lib directory
+     * This is the default template, with a lib directory
      */
     map.insert(
         "default",
