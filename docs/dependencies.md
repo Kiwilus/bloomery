@@ -16,20 +16,19 @@ Each dependency is specified using its name and version.
 
 ```bash
 # Add a managed dependency
-blm deps add <name> <version>
-# or without a specified version
-# bloomery will search up the newest version and use it.
-blm deps add <name>
+blm add deps <name> <version>
+# or without a specified version (resolves latest)
+blm add deps <name>
 
 # Remove a managed dependency
-blm deps remove <name>
-# if you want, you can remove the JAR file too
-blm deps remove <name> --delete-jar
-# or shorter
-blm deps remove <name> -d
+blm remove deps <name>
+# also delete the downloaded JAR
+blm remove deps <name> --delete-jar
+# shorter
+blm remove deps <name> -d
 
 # List all managed dependencies
-blm deps list
+blm list deps
 ```
 
 ### Local JARs
@@ -62,13 +61,13 @@ jars = [
 
 ```bash
 # Add a local JAR path
-blm deps add-local <path>
+blm add local <path>
 
 # Remove a local JAR path from the config
-blm deps remove-local <path>
+blm remove local <path>
 
 # List all local JAR paths
-blm deps list-local
+blm list local
 ```
 
 If you don't need any external libraries, you can remove both sections or simply leave them empty:

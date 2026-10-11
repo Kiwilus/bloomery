@@ -4,6 +4,7 @@ pub mod build_jar;
 pub mod clean;
 pub mod deps;
 pub mod init;
+pub mod new;
 pub mod run;
 pub mod run_file;
 pub mod run_jar;

@@ -142,3 +142,50 @@ pub fn list_local() -> Result<()> {
     }
     Ok(())
 }
+
+pub fn add_clean_dir(dirs: &[String]) -> Result<()> {
+    let mut config = load_config()?;
+
+    for dir in dirs {
+        if config.paths.clean_dirs.iter().any(|d| d == dir) {
+            warn!("'{}' is already in clean_dirs", dir);
+            continue;
+        }
+        config.paths.clean_dirs.push(dir.clone());
+        success!("Added clean_dir '{}'", dir);
+    }
+
+    save_config(&config)?;
+    Ok(())
+}
+
+pub fn remove_clean_dir(dirs: &[String]) -> Result<()> {
+    let mut config = load_config()?;
+
+    for dir in dirs {
+        let before = config.paths.clean_dirs.len();
+        config.paths.clean_dirs.retain(|d| d != dir);
+        if config.paths.clean_dirs.len() == before {
+            error!("clean_dir '{}' not found", dir);
+        }
+        success!("Removed clean_dir '{}'", dir);
+    }
+
+    save_config(&config)?;
+    Ok(())
+}
+
+pub fn list_clean_dirs() -> Result<()> {
+    let config = load_config()?;
+
+    if config.paths.clean_dirs.is_empty() {
+        info!("No clean_dirs configured");
+        return Ok(());
+    }
+
+    println!("clean_dirs:");
+    for dir in &config.paths.clean_dirs {
+        println!("  {}", dir);
+    }
+    Ok(())
+}

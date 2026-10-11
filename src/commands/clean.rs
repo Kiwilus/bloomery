@@ -4,24 +4,40 @@ use std::fs;
 use std::path::PathBuf;
 
 /*
- * if you have a bloomery.toml in your directory, use its class_dir.
+ * if you have a bloomery.toml in your directory, use its class_dir + clean_dirs.
  * when you don't have a bloomery.toml in your directory, the 'bin' folder will be deleted.
  *
  * in both use cases you can remove multiple directorys e.g. you have a bloomery.toml file where the class_dir is 'target'
  * and you want to remove the target directory and a other directory you have.
  * you can do it with blm clean <your_directory>. bloomery will clean the directory from the bloomery.toml and additionally the directory from your CLI input.
-*/
-pub fn clean(clean_dirs: &[PathBuf]) -> Result<()> {
-    let default_dir = match load_config() {
-        Ok(config) => PathBuf::from(config.paths.class_dir),
-        Err(_) => PathBuf::from("bin"),
-    };
+ */
+pub fn clean(cli_dirs: &[PathBuf]) -> Result<()> {
+    let mut dirs: Vec<PathBuf> = Vec::new();
 
-    // vector of directory or multiple directorys
-    let mut dirs = vec![default_dir];
-    dirs.extend_from_slice(clean_dirs);
+    match load_config() {
+        Ok(config) => {
+            // always clean class_dir
+            dirs.push(PathBuf::from(&config.paths.class_dir));
 
-    // remove every directory step by step
+            // clean_dirs
+            for dir in &config.paths.clean_dirs {
+                dirs.push(PathBuf::from(dir));
+            }
+        }
+        Err(_) => {
+            // fallback if no bloomery.toml
+            dirs.push(PathBuf::from("bin"));
+        }
+    }
+
+    // add CLI arguments
+    dirs.extend_from_slice(cli_dirs);
+
+    // checking
+    dirs.sort();
+    dirs.dedup();
+
+    // removing
     for dir in dirs {
         if dir.exists() {
             fs::remove_dir_all(&dir)?;

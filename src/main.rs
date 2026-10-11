@@ -17,15 +17,19 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init { name, template } => {
+        Commands::Init { template } => {
             let template_name = match template {
                 Some(t) => t,
-                None => {
-                    let global = config::load_global_config()?;
-                    global.default_template
-                }
+                None => config::load_global_config()?.default_template,
             };
-            commands::init::init(name, &template_name)?;
+            commands::init::init(&template_name)?;
+        }
+        Commands::New { name, template } => {
+            let template_name = match template {
+                Some(t) => t,
+                None => config::load_global_config()?.default_template,
+            };
+            commands::new::new(name, &template_name)?;
         }
         Commands::Install { name, path } => templates::external::install_template(name, &path)?,
         Commands::Build => commands::build::build()?,
@@ -37,8 +41,8 @@ fn main() -> Result<()> {
         Commands::RunFile { path } => {
             commands::run_file::run_file(&path)?;
         }
-        Commands::Clean { clean_dirs } => {
-            commands::clean::clean(&clean_dirs)?;
+        Commands::Clean { extra_dirs } => {
+            commands::clean::clean(&extra_dirs)?;
         }
         Commands::RunJar { manual_jar: path } => {
             commands::run_jar::run_jar(path)?;
@@ -49,17 +53,22 @@ fn main() -> Result<()> {
         Commands::Set { key, new_value } => {
             commands::set::set(&key, &new_value)?;
         }
-        Commands::Deps { action } => match action {
-            cli::DepsAction::Add { name, version } => {
-                commands::deps::add(&name, version.as_deref())?
-            }
-            cli::DepsAction::Remove { name, delete_jar } => {
+        Commands::Add { what } => match what {
+            cli::AddWhat::Deps { name, version } => commands::deps::add(&name, version.as_deref())?,
+            cli::AddWhat::Local { path } => commands::deps::add_local(&path)?,
+            cli::AddWhat::CleanDir { dirs } => commands::deps::add_clean_dir(&dirs)?,
+        },
+        Commands::Remove { what } => match what {
+            cli::RemoveWhat::Deps { name, delete_jar } => {
                 commands::deps::remove(&name, delete_jar)?
             }
-            cli::DepsAction::List => commands::deps::list()?,
-            cli::DepsAction::AddLocal { path } => commands::deps::add_local(&path)?,
-            cli::DepsAction::RemoveLocal { path } => commands::deps::remove_local(&path)?,
-            cli::DepsAction::ListLocal => commands::deps::list_local()?,
+            cli::RemoveWhat::Local { path } => commands::deps::remove_local(&path)?,
+            cli::RemoveWhat::CleanDir { dirs } => commands::deps::remove_clean_dir(&dirs)?,
+        },
+        Commands::List { what } => match what {
+            cli::ListWhat::Deps => commands::deps::list()?,
+            cli::ListWhat::Local => commands::deps::list_local()?,
+            cli::ListWhat::CleanDirs => commands::deps::list_clean_dirs()?,
         },
     }
 

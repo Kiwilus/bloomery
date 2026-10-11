@@ -5,6 +5,7 @@ use std::path::Path;
 use crate::config::{Config, Dependencies, Paths, Project};
 use crate::templates::{builtin::get_templates, external::load_external_template};
 
+// write a fresh bloomery.toml to 'root'
 fn write_config(
     root: &Path,
     name: &str,
@@ -20,12 +21,14 @@ fn write_config(
         paths: Paths {
             main_class: main_class.to_string(),
             class_dir: class_dir.to_string(),
+            clean_dirs: Vec::new(),
         },
         dependencies: Dependencies::default(),
     };
 
     let mut content = toml::to_string_pretty(&config)?;
 
+    // Ensure [dependencies] exists before [dependencies.local]
     if let Some(pos) = content.find("[dependencies.local]") {
         content.insert_str(pos, "[dependencies]\n\n");
     } else {
@@ -33,23 +36,24 @@ fn write_config(
     }
 
     fs::write(root.join("bloomery.toml"), content)?;
-
     Ok(())
 }
 
-pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
-    let project_name = name.unwrap_or_else(|| "bloomery-project".to_string());
-    let root = Path::new(&project_name);
+// Initialize a new project in an existing directory
+pub fn init(template_name: &str) -> Result<()> {
+    let root = Path::new(".");
 
-    // Extract project name from the path so long paths are supported
-    let config_name = root
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or(&project_name);
-
-    if root.exists() {
-        error!("'{}' already exists", project_name);
+    // do not re-initialize an already configured project.
+    if root.join("bloomery.toml").exists() {
+        error!("bloomery.toml already exists in the current directory");
     }
+
+    // Use the current folder name as the project name in bloomery.toml
+    let config_name = std::env::current_dir()?
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("bloomery-project")
+        .to_string();
 
     // process extern templates
     if let Some(ext_template) = load_external_template(template_name)? {
@@ -62,14 +66,13 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
             }
         }
 
-        fs::create_dir_all(root)?;
         for dir in &ext_template.dirs {
             fs::create_dir_all(root.join(dir))?;
         }
 
         write_config(
             root,
-            config_name,
+            &config_name,
             &ext_template.version,
             &ext_template.main_class,
             &ext_template.class_dir,
@@ -80,20 +83,24 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
                 continue;
             }
             let path = crate::templates::external::template_relative_path(&file.path)?;
+            let target = root.join(path);
+            if target.exists() {
+                continue;
+            }
             if let Some(parent) = path.parent() {
                 fs::create_dir_all(root.join(parent))?;
             }
-            fs::write(root.join(path), &file.content)?;
+            fs::write(target, &file.content)?;
         }
 
         info!(
-            "Project created: {} (using installed template '{}')",
-            project_name, ext_template.name
+            "Initialized bloomery in current directory (template '{}')",
+            ext_template.name
         );
         return Ok(());
     }
 
-    // process built in templates
+    // process builtin temlates
     let builtin_templates = get_templates();
     let template = builtin_templates.get(template_name).ok_or_else(|| {
         error!(
@@ -103,27 +110,32 @@ pub fn init(name: Option<String>, template_name: &str) -> Result<()> {
         )
     })?;
 
-    fs::create_dir_all(root)?;
     for dir in template.dirs {
         fs::create_dir_all(root.join(dir))?;
     }
 
     write_config(
         root,
-        config_name,
+        &config_name,
         "0.1.0",
         template.main_class,
         template.class_dir,
     )?;
 
     for file in template.files {
-        fs::write(root.join(file.path), file.content)?;
+        let target = root.join(file.path);
+        if target.exists() {
+            continue;
+        }
+        if let Some(parent) = target.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(target, file.content)?;
     }
 
     info!(
-        "Project created: {} with '{}' template",
-        project_name, template.name
+        "Initialized bloomery in current directory (template '{}')",
+        template.name
     );
-
     Ok(())
 }

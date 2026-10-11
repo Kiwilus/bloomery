@@ -32,6 +32,8 @@ pub struct Paths {
     pub main_class: String,
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
+    #[serde(default)]
+    pub clean_dirs: Vec<String>,
 }
 
 // 'Dependencies' section from the sections struct

@@ -12,28 +12,25 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     /// create new Java project
-    Init {
-        // naming process is optional
+    New {
         name: Option<String>,
-
-        // Selected template (e.g., "default", "flat", or custom installed template)
+        #[arg(short, long)]
+        template: Option<String>,
+    },
+    /// Initialize new Java project
+    Init {
+        /// Selected template like "default", "advanced" or custom installed template
         #[arg(short, long)]
         template: Option<String>,
     },
     /// install a java project directory as a system-wide template
     Install {
-        // Name of the template to install
+        /// Name of the template to install
         #[arg(short, long)]
         name: String,
-        // Path to the directory to use as template, default is your current
+        /// Path to the directory to use as template, default is your current
         #[arg(short, long, default_value = ".")]
         path: PathBuf,
-    },
-    /// clean, remove bin or target directory
-    Clean {
-        /// Additional directories to remove
-        #[arg(value_name = "DIR")]
-        clean_dirs: Vec<PathBuf>,
     },
     /// compilation process
     Build,
@@ -66,38 +63,64 @@ pub enum Commands {
         /// this is your new value
         new_value: String,
     },
-    /// manage dependencies via CLI
-    Deps {
+    /// clean class_dir + clean_dirs (+ optional extra dirs)
+    Clean {
+        #[arg(value_name = "DIR")]
+        extra_dirs: Vec<PathBuf>,
+    },
+
+    /// add something to the project
+    Add {
         #[command(subcommand)]
-        action: DepsAction,
+        what: AddWhat,
+    },
+    /// remove something from the project
+    Remove {
+        #[command(subcommand)]
+        what: RemoveWhat,
+    },
+    /// list configured items
+    List {
+        #[command(subcommand)]
+        what: ListWhat,
     },
 }
 
 #[derive(Subcommand)]
-pub enum DepsAction {
-    /// add a managed dependency
-    Add {
-        /// artifactID
+pub enum AddWhat {
+    Deps {
         name: String,
-        /// version
         version: Option<String>,
     },
-    /// remove a managed dependency
-    Remove {
+    Local {
+        path: String,
+    },
+    #[command(name = "clean-dir")]
+    CleanDir {
+        dirs: Vec<String>,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum RemoveWhat {
+    Deps {
         name: String,
-        /// delete downloaded jar
         #[arg(long, short = 'd')]
         delete_jar: bool,
     },
-    /// list managed dependencies
-    List,
-    /// add local JAR path
-    AddLocal {
-        /// path relative to project root
+    Local {
         path: String,
     },
-    /// remove a local JAR path
-    RemoveLocal { path: String },
-    /// list local JAR paths
-    ListLocal,
+    #[command(name = "clean-dir")]
+    CleanDir {
+        dirs: Vec<String>,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum ListWhat {
+    Deps,
+    Local,
+    #[command(name = "clean-dirs")]
+    CleanDirs,
 }

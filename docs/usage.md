@@ -1,13 +1,19 @@
 ### Create a new project:
 
 ```bash
-blm init <my-new-java-project>
+blm new <my-new-java-project>
 ```
 
 This will create a folder with a Java template. You have 3 builtin templates. An easy/minimalist one, an classic one and an advanced maven like template. If you want, you can install and use a custom template.
 You can lookup how to install and use a custom template [here.](docs/custom-template.md)
 
-> If no project name is given, `blm init` creates a project called `bloomery-project`.
+> If no project name is given, `blm new` creates a project called `bloomery-project`.
+
+If you have an existing directory e.g. with a .git directory you can Initialize a new bloomery project in your directory, without creating a new one:
+
+```bash
+blm init
+```
 
 ### Build the project:
 
@@ -84,16 +90,25 @@ blm run-jar <your_jar_file>
 blm clean
 ```
 
-this will remove the folder, given in class_dir in your bloomery.toml. When you don't have a bloomery.toml file, the default directory to clean will be `bin`.
-You can clean multiple commands e.g. you have in your bloomery.toml `target` as your class dir, but you have another directory you want to remove e.g. `testdir`
+This removes the folder given in 'class_dir' in your bloomery.toml and every directory listed in 'clean_dirs'.
+When you don't have a bloomery.toml file, the default directory to clean will be bin.
 
-You can clean both directorys in 1 CLI command with:
+You can still pass extra directories on the CLI:
 
 ```bash
 blm clean testdir
 ```
 
-this will remove the `target` directory and additionally the `testdir` directory. You can remove as many directorys in 1 command as you want.
+This removes class_dir, all clean_dirs, and additionally testdir.
+
+#### Manage clean_dirs via CLI
+
+```bash
+blm add clean-dir target # 1 additional folder
+blm add clean-dir target tmp build # 2 additional folders
+blm remove clean-dir target # remove folder from bloomery.toml list
+blm list clean-dirs # list additional folders
+```
 
 ### Configuration
 
@@ -107,6 +122,7 @@ version = "0.1.0"
 [paths]
 main_class = "Main"
 class_dir = "out"
+clean_dirs = []
 
 [dependencies]
 
@@ -114,9 +130,21 @@ class_dir = "out"
 jars = []
 ```
 
-If you want to run an other main class, change your compilation folder, change your projects version, parse a dependencie or rename your project, do it in the bloomery.toml.
+section and key meaning:
 
-> If you want to add external dependencies, see the full Dependencies guide for [how to add external JARs](docs/dependencies.md).
+| Section              | Key               | Description                                  |
+|----------------------|-------------------|----------------------------------------------|
+| `[project]`          | `name`            | Project name                                 |
+| `[project]`          | `version`         | Project version                              |
+| `[paths]`            | `main_class`      | Main class used by `blm run`                 |
+| `[paths]`            | `class_dir`       | Output directory for compiled `.class` files |
+| `[paths]`            | `clean_dirs`      | Extra directories removed by `blm clean`    |
+| `[dependencies]`     | `<name> = "<version>"` | Managed Maven dependencies              |
+| `[dependencies.local]` | `jars`          | List of local JAR paths                      |
+
+If you want to run an other main class, change your compilation folder, change your projects version, parse a dependencie, rename your project and other things, do it in the bloomery.toml or via CLI.
+
+> If you want to add external dependencies, see the full Dependencies guide for [how to add dependencies](docs/dependencies.md).
 
 ### Set configuration values via CLI
 
@@ -126,4 +154,34 @@ You can also configure your project without opening the file:
 blm set <key_to_change> <your_new_value>
 ```
 
-You can change the name, version, main_class and class_dir
+You can change the name, version, main_class and class_dir:
+
+```bash
+blm set name my-project
+blm set version 0.2.0
+blm set main_class com.example.Main
+blm set class_dir out
+```
+
+Lists such as local JARs or clean_dirs are managed with add/remove/list:
+
+```bash
+# clean_dirs
+blm add clean-dir target tmp
+blm remove clean-dir target
+blm list clean-dirs
+
+# managed dependencies
+blm add deps gson
+blm add deps gson 2.11.0
+blm remove deps gson
+blm remove deps gson -d
+blm list deps
+
+# local JARs
+blm add local lib/custom.jar
+blm remove local lib/custom.jar
+blm list local
+```
+
+For details on managed and local dependencies, see [dependencies.md](docs/dependencies.md).
