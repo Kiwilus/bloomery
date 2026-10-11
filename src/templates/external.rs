@@ -23,6 +23,8 @@ pub struct StoredTemplate {
     pub main_class: String,
     #[serde(default = "default_class_dir")]
     pub class_dir: String,
+    #[serde(default)]
+    pub clean_dirs: Vec<String>,
 }
 
 fn default_class_dir() -> String {
@@ -56,10 +58,15 @@ pub fn template_relative_path(path: &str) -> Result<&Path> {
     Ok(path)
 }
 
-fn load_template_config(source_dir: &Path) -> Result<(String, String, String)> {
+fn load_template_config(source_dir: &Path) -> Result<(String, String, String, Vec<String>)> {
     let path = source_dir.join("bloomery.toml");
     if !path.exists() {
-        return Ok((default_version(), "Main".to_string(), "bin".to_string()));
+        return Ok((
+            default_version(),
+            "Main".to_string(),
+            "bin".to_string(),
+            Vec::new(),
+        ));
     }
 
     let content =
@@ -70,6 +77,7 @@ fn load_template_config(source_dir: &Path) -> Result<(String, String, String)> {
         config.project.version,
         config.paths.main_class,
         config.paths.class_dir,
+        config.paths.clean_dirs,
     ))
 }
 
@@ -96,7 +104,7 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
     let mut files = Vec::new();
 
     collect_template_assets(source_dir, source_dir, &mut dirs, &mut files)?;
-    let (version, main_class, class_dir) = load_template_config(source_dir)?;
+    let (version, main_class, class_dir, clean_dirs) = load_template_config(source_dir)?;
 
     let template_data = StoredTemplate {
         name: name.clone(),
@@ -105,6 +113,7 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
         version,
         main_class,
         class_dir,
+        clean_dirs,
     };
 
     let target_path = get_templates_dir()?.join(format!("{}.toml", name));

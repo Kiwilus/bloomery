@@ -12,6 +12,7 @@ fn write_config(
     version: &str,
     main_class: &str,
     class_dir: &str,
+    clean_dirs: Vec<String>,
 ) -> Result<()> {
     let config = Config {
         project: Project {
@@ -21,7 +22,7 @@ fn write_config(
         paths: Paths {
             main_class: main_class.to_string(),
             class_dir: class_dir.to_string(),
-            clean_dirs: Vec::new(),
+            clean_dirs,
         },
         dependencies: Dependencies::default(),
     };
@@ -75,10 +76,11 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
 
         write_config(
             root,
-            config_name,
+            &config_name,
             &ext_template.version,
             &ext_template.main_class,
             &ext_template.class_dir,
+            ext_template.clean_dirs.clone(),
         )?;
 
         for file in &ext_template.files {
@@ -116,10 +118,11 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
 
     write_config(
         root,
-        config_name,
+        &config_name,
         "0.1.0",
         template.main_class,
         template.class_dir,
+        Vec::new(),
     )?;
 
     for file in template.files {
