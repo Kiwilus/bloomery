@@ -3,5 +3,4 @@ locker/
 TODO.md
 Cargo.lock
 bloomery-project
-scripts/new-release.sh
-scripts/test-new-release.sh
+scripts/

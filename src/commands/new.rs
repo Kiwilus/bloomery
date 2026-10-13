@@ -76,7 +76,7 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
 
         write_config(
             root,
-            &config_name,
+            config_name,
             &ext_template.version,
             &ext_template.main_class,
             &ext_template.class_dir,
@@ -118,7 +118,7 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
 
     write_config(
         root,
-        &config_name,
+        config_name,
         "0.1.0",
         template.main_class,
         template.class_dir,

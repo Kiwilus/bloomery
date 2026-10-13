@@ -2,10 +2,12 @@ use anyhow::Result;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::SystemTime;
 
 use crate::config::{Config, load_config};
 use crate::deps;
 
+// finds all Java files in a directory.
 fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
     if !dir.exists() {
@@ -24,11 +26,52 @@ fn find_java_files(dir: &Path) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
-// build function to compile java code and dependency support
+// Convert a Java file path into expected class file path
+fn expected_class_file(java_file: &Path, src_dir: &Path, class_dir: &Path) -> PathBuf {
+    let relative = java_file.strip_prefix(src_dir).unwrap_or(java_file);
+    let mut class_rel = relative.to_path_buf();
+    class_rel.set_extension("class");
+    class_dir.join(class_rel)
+}
+
+// Checks if a Java file must be compiled again
+fn needs_recompile(java_file: &Path, class_file: &Path) -> Result<bool> {
+    if !class_file.exists() {
+        return Ok(true);
+    }
+
+    let java_mtime = fs::metadata(java_file)?
+        .modified()
+        .unwrap_or(SystemTime::UNIX_EPOCH);
+    let class_mtime = fs::metadata(class_file)?
+        .modified()
+        .unwrap_or(SystemTime::UNIX_EPOCH);
+
+    Ok(java_mtime > class_mtime)
+}
+
+// return only the Java files that need to be compiled
+fn collect_files_to_compile(
+    java_files: &[PathBuf],
+    src_dir: &Path,
+    class_dir: &Path,
+) -> Result<Vec<PathBuf>> {
+    let mut to_compile = Vec::new();
+
+    for java in java_files {
+        let class_file = expected_class_file(java, src_dir, class_dir);
+        if needs_recompile(java, &class_file)? {
+            to_compile.push(java.clone());
+        }
+    }
+
+    Ok(to_compile)
+}
+
+// build the classpath for the compiler and dependencies
 pub fn build_classpath(config: &Config) -> Result<String> {
     let mut entries = Vec::new();
 
-    // Put the output directory first
     entries.push(config.paths.class_dir.clone());
     entries.extend(deps::resolve_classpath_jars(config)?);
 
@@ -47,6 +90,7 @@ pub fn check_jars(config: &Config) -> Result<()> {
     Ok(())
 }
 
+// Builds the project by compiling Java source files.
 pub fn build() -> Result<()> {
     let config = load_config()?;
     info!(
@@ -54,10 +98,8 @@ pub fn build() -> Result<()> {
         config.project.name, config.project.version
     );
 
-    // Check dependencies before compiling anything
     check_jars(&config)?;
 
-    // checks if 1 or many dependencies
     if !config.dependencies.local.jars.is_empty() {
         info!(
             "Including {} dependenc{} in classpath",
@@ -70,28 +112,42 @@ pub fn build() -> Result<()> {
         );
     }
 
-    // Find Java source files
     let src_dir = Path::new("src");
+    let class_dir = Path::new(&config.paths.class_dir);
+
     let java_files = find_java_files(src_dir)?;
 
     if java_files.is_empty() {
         error!("No .java file found at src");
     }
 
-    fs::create_dir_all(&config.paths.class_dir)?;
+    fs::create_dir_all(class_dir)?;
 
-    // build the classpath
+    // Compile only new or modified source files
+    let to_compile = collect_files_to_compile(&java_files, src_dir, class_dir)?;
+
+    if to_compile.is_empty() {
+        success!("Nothing to compile");
+        return Ok(());
+    }
+
+    info!(
+        "Compiling {} of {} source file(s)...",
+        to_compile.len(),
+        java_files.len()
+    );
+
     let classpath = build_classpath(&config)?;
 
-    // javac -cp <classpath> -d <class_dir> -encoding UTF-8 <java_files>
+    // javac -cp <classpath> -d <class_dir> -encoding UTF-8 <java_files_to_compile>
     let status = match Command::new("javac")
         .arg("-cp")
         .arg(&classpath)
         .arg("-d")
-        .arg(&config.paths.class_dir)
+        .arg(class_dir)
         .arg("-encoding")
         .arg("UTF-8")
-        .args(&java_files)
+        .args(&to_compile)
         .status()
     {
         Ok(status) => status,
@@ -104,6 +160,10 @@ pub fn build() -> Result<()> {
         error!("Compilation failed");
     }
 
-    success!("Build successfully ({} files)", java_files.len());
+    success!(
+        "Build successfully ({} file{})",
+        to_compile.len(),
+        if to_compile.len() == 1 { "" } else { "s" }
+    );
     Ok(())
 }

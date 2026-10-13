@@ -9,7 +9,7 @@ use crate::deps;
 
 /// Package the project into a fat JAR (classes + all dependencies).
 pub fn package(output_dir: &Path) -> Result<()> {
-    // build first so the class files exist and ensure that managed FARs are downloaded
+    // build first so the class files exist and ensure that managed JARs are downloaded
     build()?;
 
     let config = load_config()?;
