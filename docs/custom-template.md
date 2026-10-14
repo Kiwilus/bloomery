@@ -35,9 +35,13 @@ clean_dirs = []
 
 [dependencies.local]
 jars = []
+
+[build]
+release = 21
+jdk_path = "/path/to/specific_JDK"
 ```
 
-the two [dependencies] sections are optional, but they are part of the full bloomery.toml.
+the two [dependencies] and [build] sections are optional, but they are part of the full bloomery.toml.
 
 `name` is the name of your project
 `version` is the version of your project

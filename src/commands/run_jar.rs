@@ -6,11 +6,16 @@ use crate::config::load_config;
 
 // runs a jar, either the one from the package command or one you specify
 pub fn run_jar(jar: Option<String>) -> Result<()> {
-    let jar_path = match jar {
-        Some(j) => j,
+    let (jar_path, java_bin) = match jar {
+        Some(j) => (j, {
+            // Prefer configured java if bloomery.toml exists
+            load_config()
+                .map(|c| c.build.java())
+                .unwrap_or_else(|_| "java".to_string())
+        }),
         None => {
             let config = load_config()?;
-            format!("{}.jar", config.project.name)
+            (format!("{}.jar", config.project.name), config.build.java())
         }
     };
 
@@ -20,15 +25,13 @@ pub fn run_jar(jar: Option<String>) -> Result<()> {
 
     info!("starting {} ...", jar_path);
 
-    let status = match Command::new("java").arg("-jar").arg(&jar_path).status() {
+    let status = match Command::new(&java_bin).arg("-jar").arg(&jar_path).status() {
         Ok(s) => s,
-        Err(_) => {
-            error!("could not start java");
-        }
+        Err(_) => error!("could not start java"),
     };
 
     if !status.success() {
-        error!("jar crashed / failed");
+        error!("jar crashed or failed");
     }
 
     Ok(())

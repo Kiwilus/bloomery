@@ -2,44 +2,8 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-use crate::config::{Config, Dependencies, Paths, Project};
+use crate::config::Build;
 use crate::templates::{builtin::get_templates, external::load_external_template};
-
-// write fresh bloomery.toml into 'root'
-fn write_config(
-    root: &Path,
-    name: &str,
-    version: &str,
-    main_class: &str,
-    class_dir: &str,
-    clean_dirs: Vec<String>,
-) -> Result<()> {
-    let config = Config {
-        project: Project {
-            name: name.to_string(),
-            version: version.to_string(),
-        },
-        paths: Paths {
-            main_class: main_class.to_string(),
-            class_dir: class_dir.to_string(),
-            clean_dirs,
-        },
-        dependencies: Dependencies::default(),
-    };
-
-    let mut content = toml::to_string_pretty(&config)?;
-
-    // Ensure [dependencies] exists before [dependencies.local]
-    if let Some(pos) = content.find("[dependencies.local]") {
-        content.insert_str(pos, "[dependencies]\n\n");
-    } else {
-        content.push_str("\n[dependencies]\n");
-    }
-
-    fs::write(root.join("bloomery.toml"), content)?;
-
-    Ok(())
-}
 
 // create a new project in a new directory
 pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
@@ -74,13 +38,17 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
             fs::create_dir_all(root.join(dir))?;
         }
 
-        write_config(
+        crate::config::write_config(
             root,
             config_name,
             &ext_template.version,
             &ext_template.main_class,
             &ext_template.class_dir,
             ext_template.clean_dirs.clone(),
+            Build {
+                release: ext_template.release.clone(),
+                jdk_path: ext_template.jdk_path.clone(),
+            },
         )?;
 
         for file in &ext_template.files {
@@ -116,13 +84,14 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
         fs::create_dir_all(root.join(dir))?;
     }
 
-    write_config(
+    crate::config::write_config(
         root,
         config_name,
         "0.1.0",
         template.main_class,
         template.class_dir,
         Vec::new(),
+        Build::default(),
     )?;
 
     for file in template.files {

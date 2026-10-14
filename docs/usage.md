@@ -21,8 +21,7 @@ blm init
 blm build
 ```
 
-> it will build all java files in your source directory
-
+> it will build all java files in your source directory. Only new, modified files will be compiled. If [java].release is set in bloomery.toml, bloomery passes --release <version> to javac
 
 ### Run the project:
 
@@ -66,7 +65,7 @@ If you want to build a jar file, you can use:
 blm build-jar
 ```
 
-> This will build your code into java-bytecode, extract your optional external dependencies and package it all in one .jar file
+> This Compiles your code (honoring [java].release if set), extracts optional external dependencies, and packages everything into one .jar file.
 
 Your packaged .jar file will be in your current directory.
 
@@ -128,6 +127,10 @@ clean_dirs = []
 
 [dependencies.local]
 jars = []
+
+[build]
+release = "21" 
+jdk_path: "/usr/bin/jdk21"
 ```
 
 section and key meaning:
@@ -138,13 +141,11 @@ section and key meaning:
 | `[project]`          | `version`         | Project version                              |
 | `[paths]`            | `main_class`      | Main class used by `blm run`                 |
 | `[paths]`            | `class_dir`       | Output directory for compiled `.class` files |
-| `[paths]`            | `clean_dirs`      | Extra directories removed by `blm clean`    |
+| `[paths]`            | `clean_dirs`      | Extra directories removed by `blm clean`     |
 | `[dependencies]`     | `<name> = "<version>"` | Managed Maven dependencies              |
 | `[dependencies.local]` | `jars`          | List of local JAR paths                      |
-
-If you want to run an other main class, change your compilation folder, change your projects version, parse a dependencie, rename your project and other things, do it in the bloomery.toml or via CLI.
-
-> If you want to add external dependencies, see the full Dependencies guide for [how to add dependencies](docs/dependencies.md).
+| `[build]`            | `release`         | target Java version for Javac                |
+| `[build]`            | `jdk_path`        | optional path to a specific or custom JDK    |
 
 ### Set configuration values via CLI
 
@@ -161,6 +162,8 @@ blm set name my-project
 blm set version 0.2.0
 blm set main_class com.example.Main
 blm set class_dir out
+blm set release 21
+blm set jdk_path /usr/local/bin/jdk21
 ```
 
 Lists such as local JARs or clean_dirs are managed with add/remove/list:

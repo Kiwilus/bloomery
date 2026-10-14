@@ -48,7 +48,7 @@ pub fn package(output_dir: &Path) -> Result<()> {
                 .map_err(|_| error!("could not find jar: {jar}"))?;
 
             // jar xf <jar_path> <temp_dir>
-            let status = Command::new("jar")
+            let status = Command::new(config.build.jar())
                 .arg("xf")
                 .arg(&jar_path)
                 .current_dir(&temp_dir)
@@ -81,7 +81,7 @@ pub fn package(output_dir: &Path) -> Result<()> {
     fs::write(&manifest_path, &manifest_content)?;
 
     // jar cfm <output_jar> <manifest_path> -C <temp_dir> .
-    let status = Command::new("jar")
+    let status = Command::new(config.build.jar())
         .arg("cfm")
         .arg(&output_jar)
         .arg(&manifest_path)

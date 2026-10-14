@@ -139,20 +139,26 @@ pub fn build() -> Result<()> {
 
     let classpath = build_classpath(&config)?;
 
-    // javac -cp <classpath> -d <class_dir> -encoding UTF-8 <java_files_to_compile>
-    let status = match Command::new("javac")
-        .arg("-cp")
+    // javac -cp <classpath> -d <class_dir> -encoding UTF-8 [--release N] <files>
+    let mut cmd = Command::new(config.build.javac());
+    cmd.arg("-cp")
         .arg(&classpath)
         .arg("-d")
         .arg(class_dir)
         .arg("-encoding")
-        .arg("UTF-8")
-        .args(&to_compile)
-        .status()
-    {
+        .arg("UTF-8");
+
+    if let Some(ref release) = config.build.release {
+        cmd.arg("--release").arg(release);
+        info!("Targeting Java {}", release);
+    }
+
+    cmd.args(&to_compile);
+
+    let status = match cmd.status() {
         Ok(status) => status,
         Err(_) => {
-            error!("javac not found.");
+            error!("{} not found.", config.build.javac());
         }
     };
 
