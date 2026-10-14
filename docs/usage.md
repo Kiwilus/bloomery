@@ -123,14 +123,14 @@ main_class = "Main"
 class_dir = "out"
 clean_dirs = []
 
+[build]
+release = "21" 
+jdk_home: "/usr/bin/jdk21"
+
 [dependencies]
 
 [dependencies.local]
 jars = []
-
-[build]
-release = "21" 
-jdk_path: "/usr/bin/jdk21"
 ```
 
 section and key meaning:
@@ -142,10 +142,11 @@ section and key meaning:
 | `[paths]`            | `main_class`      | Main class used by `blm run`                 |
 | `[paths]`            | `class_dir`       | Output directory for compiled `.class` files |
 | `[paths]`            | `clean_dirs`      | Extra directories removed by `blm clean`     |
+| `[build]`            | `release`         | target Java version for Javac                |
+| `[build]`            | `jdk_home`        | optional path to a specific or custom JDK    |
 | `[dependencies]`     | `<name> = "<version>"` | Managed Maven dependencies              |
 | `[dependencies.local]` | `jars`          | List of local JAR paths                      |
-| `[build]`            | `release`         | target Java version for Javac                |
-| `[build]`            | `jdk_path`        | optional path to a specific or custom JDK    |
+
 
 ### Set configuration values via CLI
 
@@ -163,7 +164,7 @@ blm set version 0.2.0
 blm set main_class com.example.Main
 blm set class_dir out
 blm set release 21
-blm set jdk_path /usr/local/bin/jdk21
+blm set jdk_home /usr/local/bin/jdk21
 ```
 
 Lists such as local JARs or clean_dirs are managed with add/remove/list:

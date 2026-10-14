@@ -46,8 +46,14 @@ pub fn new(name: Option<String>, template_name: &str) -> Result<()> {
             &ext_template.class_dir,
             ext_template.clean_dirs.clone(),
             Build {
-                release: ext_template.release.clone(),
-                jdk_path: ext_template.jdk_path.clone(),
+                release: ext_template
+                    .release
+                    .clone()
+                    .or_else(|| Some("17".to_string())),
+                jdk_home: ext_template
+                    .jdk_home
+                    .clone()
+                    .or_else(|| std::env::var("JAVA_HOME").ok().filter(|s| !s.is_empty())),
             },
         )?;
 

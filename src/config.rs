@@ -16,9 +16,9 @@ pub struct Config {
     pub project: Project,
     pub paths: Paths,
     #[serde(default)]
-    pub dependencies: Dependencies,
-    #[serde(default)]
     pub build: Build,
+    #[serde(default)]
+    pub dependencies: Dependencies,
 }
 
 // 'Project' section from the sections struct
@@ -60,21 +60,21 @@ pub struct LocalDependencies {
 }
 
 // 'build section from the sections struct'
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Build {
     // release version like 17 or 21
     #[serde(default)]
     pub release: Option<String>,
     // optional path to exact JDK to use
     #[serde(default)]
-    pub jdk_path: Option<String>,
+    pub jdk_home: Option<String>,
 }
 
 impl Build {
     // path to a tool like java/javac or jar
     pub fn tool(&self, name: &str) -> String {
-        if let Some(jdk_path) = &self.jdk_path {
-            let bin = Path::new(jdk_path).join("bin").join(name);
+        if let Some(jdk_home) = &self.jdk_home {
+            let bin = Path::new(jdk_home).join("bin").join(name);
             // attach .exe on windows if not already present
             #[cfg(windows)]
             {
@@ -99,6 +99,16 @@ impl Build {
     }
     pub fn jar(&self) -> String {
         self.tool("jar")
+    }
+}
+
+// JDK_HOME and release are in bloomery.toml
+impl Default for Build {
+    fn default() -> Self {
+        Self {
+            release: Some("21".to_string()),
+            jdk_home: std::env::var("JAVA_HOME").ok().filter(|s| !s.is_empty()),
+        }
     }
 }
 
@@ -190,7 +200,7 @@ pub fn write_config(
 
     let mut content = toml::to_string_pretty(&config)?;
 
-    // Ensure [dependencies] exists before [dependencies.local]
+    // Ensure [dependencies] is above [dependencies.local]
     if let Some(pos) = content.find("[dependencies.local]") {
         content.insert_str(pos, "[dependencies]\n\n");
     } else {

@@ -31,17 +31,17 @@ main_class = "com.example.App"
 class_dir = "bin"
 clean_dirs = []
 
+[build]
+release = 21
+jdk_home = "/path/to/specific_JDK"
+
 [dependencies]
 
 [dependencies.local]
 jars = []
-
-[build]
-release = 21
-jdk_path = "/path/to/specific_JDK"
 ```
 
-the two [dependencies] and [build] sections are optional, but they are part of the full bloomery.toml.
+the two [dependencies] and [build] sections are optional, but they are part of the full bloomery.toml configuration file.
 
 `name` is the name of your project
 `version` is the version of your project

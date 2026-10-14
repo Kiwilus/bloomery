@@ -13,7 +13,7 @@ pub fn set(key: &str, new_value: &str) -> Result<()> {
         "main_class" => config.paths.main_class = new_value.to_string(),
         "class_dir" => config.paths.class_dir = new_value.to_string(),
         "release" => config.build.release = Some(new_value.to_string()),
-        "jdk_path" => config.build.jdk_path = Some(new_value.to_string()),
+        "jdk_home" => config.build.jdk_home = Some(new_value.to_string()),
 
         _ => error!(
             "Unknown key '{}'. Supported: version, name, main_class, class_dir",

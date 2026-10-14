@@ -28,7 +28,7 @@ pub struct StoredTemplate {
     #[serde(default)]
     pub release: Option<String>,
     #[serde(default)]
-    pub jdk_path: Option<String>,
+    pub jdk_home: Option<String>,
 }
 
 fn default_class_dir() -> String {
@@ -94,7 +94,7 @@ fn load_template_config(
         config.paths.class_dir,
         config.paths.clean_dirs,
         config.build.release,
-        config.build.jdk_path,
+        config.build.jdk_home,
     ))
 }
 
@@ -121,7 +121,7 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
     let mut files = Vec::new();
 
     collect_template_assets(source_dir, source_dir, &mut dirs, &mut files)?;
-    let (version, main_class, class_dir, clean_dirs, release, jdk_path) =
+    let (version, main_class, class_dir, clean_dirs, release, jdk_home) =
         load_template_config(source_dir)?;
 
     let template_data = StoredTemplate {
@@ -133,7 +133,7 @@ pub fn install_template(name: String, source_dir: &Path) -> Result<()> {
         class_dir,
         clean_dirs,
         release,
-        jdk_path,
+        jdk_home,
     };
 
     let target_path = get_templates_dir()?.join(format!("{}.toml", name));
